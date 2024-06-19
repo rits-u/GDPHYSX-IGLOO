@@ -7,6 +7,7 @@
 
 #include "Model/Model3D.h"
 #include "Model/Shader.h"
+#include "Model/ModelManager.h"
 #include "Camera/MyCamera.h"
 #include "Camera/OrthoCamera.h"
 #include "Camera/PerspectiveCamera.h"
@@ -44,6 +45,13 @@ PerspectiveCamera* persCamera = new PerspectiveCamera();
 OrthoCamera* orthoCamera = new OrthoCamera();
 
 
+int getRandomNumber(int lowerBound, int upperBound) {
+    int offset = lowerBound;
+    int range = upperBound - lowerBound + 1;
+    int nRet = offset + (rand() % range);
+    return nRet;
+}
+
 
 int main(void)
 {
@@ -64,39 +72,6 @@ int main(void)
 
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    std::list<Model3D*> models;
-
-   
-    P6::PhysicsWorld pWorld = P6::PhysicsWorld();
-
-    P6::P6Particle p1 = P6::P6Particle();
-    p1.Position = P6::MyVector(0, 0, 0);
-    p1.Velocity = P6::MyVector(0, -40, 0);   
-     //  p1.Acceleration = P6::MyVector(14.5, -14.5, -14.5);
-      // p1.damping = 1.0f;
-    p1.lifespan = 10;
-   // p1.lifespan = std::chrono::seconds(10);
-    p1.mass = 0.5; // 1KG
-    p1.AddForce(P6::MyVector(60, 0, 0));  //around 6000,0,0 kg m/s^2
-    pWorld.AddParticle(&p1);
-
-    P6::P6Particle p2 = P6::P6Particle();
-    p2.Position = P6::MyVector(20, 0, 0);
-    p2.Velocity = P6::MyVector(80, -80, -80);   
-     //  p1.Acceleration = P6::MyVector(14.5, -14.5, -14.5);
-      // p1.damping = 1.0f;
-    p2.lifespan = 5;
-    // p1.lifespan = std::chrono::seconds(10);
-    p2.mass = 10.0; // 1KG
-    p2.AddForce(P6::MyVector(6000, 0, 0));  //around 6000,0,0 kg m/s^2
-    pWorld.AddParticle(&p2);
-
-
-    //--------ORTHO CAMERA-------
-    orthoCamera->setPosition(-SCREEN_WIDTH, SCREEN_WIDTH, -SCREEN_HEIGHT, SCREEN_HEIGHT);
-    glm::mat4 viewMatrix = orthoCamera->giveView();
-    glm::mat4 projection = orthoCamera->giveProjection();
-
 
     //--------CREATE SHADER--------
     Shader* shader = new Shader();
@@ -106,50 +81,99 @@ int main(void)
 
 
 
-    Model3D* sphere1 = new Model3D(p1.Position,
-                                   glm::vec3(15, 15, 15),
-                                   glm::vec4(254 / 254.0f, 0.0f / 254.0f, 0.0f / 254.0f, 1.0f),
-                                   shaderProg);
-    models.push_back(sphere1);
-
-    Model3D* sphere2 = new Model3D(p2.Position,
-                                glm::vec3(20, 20, 20),
-                                glm::vec4(52.0f / 254.0f, 235.0f / 254.0f, 70.0f / 254.0f, 1.0f),
-                                shaderProg);
-    models.push_back(sphere2);
+    //--------ORTHO CAMERA-------
+    orthoCamera->setPosition(-SCREEN_WIDTH, SCREEN_WIDTH, -SCREEN_HEIGHT, SCREEN_HEIGHT);
+    glm::mat4 viewMatrix = orthoCamera->giveView();
+    glm::mat4 projection = orthoCamera->giveProjection();
 
 
-    //--------SPHERE MODEL--------
-    tinyobj::attrib_t attributes;
+    std::list<Model3D*> models;
+    P6::PhysicsWorld pWorld = P6::PhysicsWorld();
+    ModelManager modelTest = ModelManager();
+    std::list<RenderParticle*> RenderParticles;
+
     GLuint VAO, VBO;
 
-    for (std::list<Model3D*>::iterator i = models.begin();
-        i != models.end();
-        i++
-        ) {
+    int numSparks = 0;
+    std::cout << "Input spark cout: ";
+    std::cin >> numSparks;
 
-        (*i)->loadModel_("3D/sphere.obj", &attributes, &VBO);
-        (*i)->setCameraProperties(projection, viewMatrix);
+    std::cout << numSparks << std::endl << std::endl;
+    srand((unsigned)time(NULL));
+    for (int i = 0; i < numSparks; i++) {
+
+        //GENERATE RANDOM COLOR
+        int color[3];
+        for (int j = 0; j < 3; j++)
+            color[j] = getRandomNumber(50, 254);
+
+        glm::vec4 colorVec = glm::vec4(color[0] / 254.0f, color[1] / 254.0f, color[2] / 254.0f, 1.0f);
+
+        //GENERATE RADIUS
+        int radius = getRandomNumber(2, 10);
+        
+        //GENERATE LIFESPAN
+        int lifespan = getRandomNumber(1, 10);
+        
+
+        //INSTANTIATE PARTICLE
+        P6Particle* particle = new P6Particle(MyVector(0, 15, 0), MyVector(0, -40, 0), MyVector(-14, 0, 0));
+
+        //LINES 124-151 R TEMPORARY
+        if (i == 1) {
+            particle->Position = P6::MyVector(0, 600, 0);
+            particle->Velocity = P6::MyVector(10, -40, 0);
+            particle->Acceleration = P6::MyVector(14.5, -14.5, 0);
+
+        }
+
+        if (i == 2) {
+            particle->Position = P6::MyVector(100, 300, 0);
+            particle->Velocity = P6::MyVector(100, -50, 0);
+            particle->Acceleration = P6::MyVector(14.5, -14.5, 0);
+
+        }
+
+        if (i == 3) {
+            particle->Position = P6::MyVector(-50, 100, 0);
+            particle->Velocity = P6::MyVector(-10, -50, 0);
+            particle->Acceleration = P6::MyVector(14.5, -14.5, 0);
+
+        }
+
+        if (i == 4) {
+            particle->Position = P6::MyVector(-400, 400, 0);
+            particle->Velocity = P6::MyVector(-10, -50, 0);
+            particle->Acceleration = P6::MyVector(14.5, -14.5, 0);
+
+        }
+
+
+        //INSTANTIATE MODEL
+        Model3D* model = new Model3D(glm::vec3(radius * 2, radius * 2, radius * 2), colorVec, shaderProg);
+        model->loadModel("3D/sphere.obj", &VBO);
+        model->setCameraProperties(projection, viewMatrix);
+        modelTest.AddModel(model);
+
+
+        particle->mass = 1.5f;
+        pWorld.AddParticle(particle);
+
+        
+        RenderParticle* rp = new RenderParticle(particle, model);
+        RenderParticles.push_back(rp);
+
+
+        std::cout << radius << std::endl;
+       // std"
     }
-
+    
 
     using clock = std::chrono::high_resolution_clock;
     auto curr_time = clock::now();
     auto prev_time = curr_time;
     std::chrono::nanoseconds curr_ns(0);
 
-    
-    std::list<RenderParticle*> RenderParticles;
-
-    RenderParticle rp1 = RenderParticle(&p1, sphere1);
-    RenderParticles.push_back(&rp1);
-
-    RenderParticle rp2 = RenderParticle(&p2, sphere2);
-    RenderParticles.push_back(&rp2);
-
-
-    //timer
-    auto test_timer = std::chrono::steady_clock::now();
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -160,16 +184,11 @@ int main(void)
 
         //FIXED UPDATE
         curr_time = clock::now();       
-
         auto dur = std::chrono::duration_cast<std::chrono::nanoseconds> (curr_time - prev_time);
-
-        timer += (float)dur.count() / 1000;
-
-
         prev_time = curr_time;     
-
         curr_ns += dur; 
 
+        timer += (float)dur.count() / 1000;
       //  std::cout << timer << std::endl;
  
         if (curr_ns >= timestep){
@@ -179,34 +198,47 @@ int main(void)
 
             pWorld.Update((float)ms.count() / 1000);
 
-
+            modelTest.checkModels();
         }
-
-        auto now = clock::now();
 
         
         //--------DRAW MODEL--------
-        glUseProgram(shaderProg);
-
-        
-        //temporary
-        if (p1.lifespan <= timer / converter) {
-            p1.Destroy();
-        }
-
-        if (p2.lifespan <= timer / converter) {
-            p2.Destroy();
-        }
-
-
+        int test = 0;
         for (std::list<RenderParticle*>::iterator i = RenderParticles.begin();
             i != RenderParticles.end();
             i++
             ) {
 
-         //   if(pWorld[i])
-            (*i)->draw();
+            if (test >= numSparks + 1) {
+                test = 1;
+            }
+            else {
+                test++;
+            }
+
+           // (*i)->debugDraw(test);
+                (*i)->draw();
+            
         }
+
+        //int num = 0;
+        //for (std::list<Model3D*>::iterator i = models.begin();
+        //    i != models.end();
+        //    i++
+        //    ) {
+
+        //    if (num >= numSparks + 1) {
+        //        num = 1;
+        //       
+        //    }
+        //    else {
+        //        num++;
+        //    }
+        //  //  std::cout << num << " yuh " << (*i)->getPosition() << std::endl;
+        //   // num++;
+
+
+        //}
        
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -219,4 +251,3 @@ int main(void)
     glfwTerminate();
     return 0;
 }
-

@@ -17,8 +17,8 @@ glm::mat4 OrthoCamera::giveView() {
 }
 
 glm::mat4 OrthoCamera::giveProjection() {
-	this->z_near = 2000.0f;
-	this->z_far = -2000.0f;
+	this->z_near = 1000.0f;
+	this->z_far = -1000.0f;
 	return glm::ortho(this->leftMost, this->rightMost, this->bottomMost, this->topMost, this->z_near, this->z_far);
 }
 

@@ -4,6 +4,8 @@
 #include "ForceRegistry.h"
 #include "GravityForceGenerator.h"
 
+#include "iostream"
+
 namespace P6 {
 	class PhysicsWorld
 	{

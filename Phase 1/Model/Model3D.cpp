@@ -14,21 +14,8 @@ Model3D::Model3D() {
     this->viewMatrix = glm::mat4(1);
 }
 
-Model3D::Model3D(MyVector position, glm::vec3 scale, glm::vec4 color) {
-    this->position = position;
-    this->scale = scale;
-    this->axis = glm::vec3(0.0f, 1.0f, 0.0f);
-    this->theta = glm::vec3(0.0f, 0.0f, 0.0f);
-    this->color = color;
-    this->mesh_indices = {};
-    this->VAO = NULL;
-    this->shaderProg = NULL;
-    this->projection = glm::mat4(1);
-    this->viewMatrix = glm::mat4(1);
-}
-
-Model3D::Model3D(MyVector position, glm::vec3 scale, glm::vec4 color, GLuint shaderProg) {
-    this->position = position;
+Model3D::Model3D(glm::vec3 scale, glm::vec4 color, GLuint shaderProg) {
+    this->position = P6::MyVector(0.0f, 0.0f, 0.0f);
     this->scale = scale;
     this->axis = glm::vec3(0.0f, 1.0f, 0.0f);
     this->theta = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -40,16 +27,14 @@ Model3D::Model3D(MyVector position, glm::vec3 scale, glm::vec4 color, GLuint sha
     this->viewMatrix = glm::mat4(1);
 }
 
-
-void Model3D::loadModel_(std::string objSrc, tinyobj::attrib_t* attributes, GLuint* VBO) {
+void Model3D::loadModel(std::string objSrc, GLuint* VBO) {
     std::string path = objSrc;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> material;
     std::string warning, error;
+    tinyobj::attrib_t attributes;
 
-    //tinyobj::attrib_t attributes;
-
-    bool success = tinyobj::LoadObj(attributes, &shapes, &material, &warning, &error, path.c_str());
+    bool success = tinyobj::LoadObj(&attributes, &shapes, &material, &warning, &error, path.c_str());
 
     std::vector<GLuint> mesh_indices;
     for (int i = 0; i < shapes[0].mesh.indices.size(); i++)
@@ -59,12 +44,11 @@ void Model3D::loadModel_(std::string objSrc, tinyobj::attrib_t* attributes, GLui
 
     this->mesh_indices = mesh_indices;
 
-    this->bindBuffers_(*(attributes), VBO);
-
+    this->bindBuffers(attributes, VBO);
 }
  
 
-void Model3D::bindBuffers_(tinyobj::attrib_t attributes, GLuint* VBO) {
+void Model3D::bindBuffers(tinyobj::attrib_t attributes, GLuint* VBO) {
     GLuint EBO;
     glGenVertexArrays(1, &this->VAO);
     glGenBuffers(1, VBO);
@@ -84,10 +68,10 @@ void Model3D::bindBuffers_(tinyobj::attrib_t attributes, GLuint* VBO) {
 }
 
 
-void  Model3D::drawModel_() {
+void  Model3D::drawModel() {
 
     //bind camera
-    this->bindCamera_(this->projection, this->viewMatrix);
+    this->bindCamera(this->projection, this->viewMatrix);
 
     glm::mat4 transformation_matrix;
 
@@ -136,7 +120,7 @@ void  Model3D::drawModel_() {
 }
 
 
-void Model3D::bindCamera_(glm::mat4 projection, glm::mat4 viewMatrix) {
+void Model3D::bindCamera(glm::mat4 projection, glm::mat4 viewMatrix) {
     unsigned int projLoc = glGetUniformLocation(this->shaderProg, "projection");
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
@@ -146,6 +130,10 @@ void Model3D::bindCamera_(glm::mat4 projection, glm::mat4 viewMatrix) {
 
 void Model3D::setPosition(MyVector position) {
     this->position = position;
+}
+
+float Model3D::getPosition() {
+    return this->position.y;
 }
 
 void Model3D::setScale(glm::vec3 scale) {

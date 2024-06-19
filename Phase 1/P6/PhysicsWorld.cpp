@@ -11,6 +11,8 @@ void PhysicsWorld::Update(float time) {
 
 	forceRegistry.UpdateForces(time);
 
+	int num = 0;
+
 	for (std::list<P6Particle*>::iterator p = Particles.begin();
 
 		p != Particles.end();
@@ -19,6 +21,15 @@ void PhysicsWorld::Update(float time) {
 		)
 	{
 		(*p)->Update(time);
+
+		if (num >= 6) {
+			num = 1;
+
+		}
+		else {
+			num++;
+		}
+		std::cout << num << " particle: " << (*p)->getPosition() << std::endl;
 	}
 }
 

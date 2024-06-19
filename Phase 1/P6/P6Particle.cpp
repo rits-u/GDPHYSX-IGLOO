@@ -1,6 +1,12 @@
 #include "P6Particle.h"
 using namespace P6;
 
+P6Particle::P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration) {
+	this->Position = Position;
+	this->Velocity = Velocity;
+;	this->Acceleration = Acceleration;
+}
+
 
 void P6Particle::UpdatePosition(float time) {
 	this->Position = this->Position + (this->Velocity * time) + ((this->Acceleration * time * time) * (1.0f / 2.0f));
@@ -50,4 +56,8 @@ void P6Particle::AddForce(MyVector force) {
 void P6Particle::ResetForce() {
 	this->accumulatedForce = MyVector(0, 0, 0);
 	this->Acceleration = MyVector(0, 0, 0);
+}
+
+float P6Particle::getPosition() {
+	return this->Position.y;
 }
