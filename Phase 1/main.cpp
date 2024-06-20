@@ -41,6 +41,67 @@ using namespace utility;
 int SCREEN_WIDTH = 800;
 int SCREEN_HEIGHT = 800;
 
+bool bPaused = false;
+MyCamera* MainCamera = new OrthoCamera();
+
+
+//Key Input Handler
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    //Orthographic
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+    {
+        MainCamera = new OrthoCamera();
+        std::cout << "Shifted to Ortho Cam" << std::endl;
+    }
+
+    //Perspective
+    else if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+    {
+        MainCamera = new PerspectiveCamera();
+        std::cout << "Shifted to Pers Cam" << std::endl;
+    }
+
+    //Rotate to the left
+    else if (key == GLFW_KEY_A && action == GLFW_PRESS)
+    {
+        
+        std::cout << "Shifted to the left" << std::endl;
+    }
+
+    //Rotate to the right
+    else if (key == GLFW_KEY_D && action == GLFW_PRESS)
+    {
+
+        std::cout << "Shifted to the right" << std::endl;
+    }
+
+    //Rotate upwards
+    else if (key == GLFW_KEY_W && action == GLFW_PRESS)
+    {
+
+        std::cout << "Shifted upwards" << std::endl;
+    }
+
+    //Rotate downwards
+    else if (key == GLFW_KEY_S && action == GLFW_PRESS)
+    {
+
+        std::cout << "Shifted downwards" << std::endl;
+    }
+
+    //Pause/Play the game
+    else if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+    {
+        if (!bPaused) bPaused = true;
+        else bPaused = false;
+
+        //pause works!
+        // std::cout << "bPausd is " << bPaused << std::endl;
+        
+    }
+ 
+}
 
 int main(void)
 {
@@ -69,15 +130,11 @@ int main(void)
     glLinkProgram(shaderProg);
     shader->deleteShader();
 
-
-    PerspectiveCamera* persCamera = new PerspectiveCamera();
-    OrthoCamera* orthoCamera = new OrthoCamera();
-
-
     //--------ORTHO CAMERA-------
-    orthoCamera->setPosition(-SCREEN_WIDTH, SCREEN_WIDTH, -SCREEN_HEIGHT, SCREEN_HEIGHT);
-    glm::mat4 viewMatrix = orthoCamera->giveView();
-    glm::mat4 projection = orthoCamera->giveProjection();
+    //orthoCamera->setPosition(-SCREEN_WIDTH, SCREEN_WIDTH, -SCREEN_HEIGHT, SCREEN_HEIGHT);
+    MainCamera->getPosition();
+    glm::mat4 viewMatrix = MainCamera->getView();
+    glm::mat4 projection = MainCamera->getProjection();
 
 
 
@@ -119,6 +176,13 @@ int main(void)
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
+        //to call the updated camera position here when keys 1/2 are pressed
+        MainCamera->getPosition();
+        MainCamera->getProjection();
+        MainCamera->getView();
+
+        //Key Callback
+        glfwSetKeyCallback(window, key_callback);
 
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -129,9 +193,12 @@ int main(void)
         prev_time = curr_time;     
        
         timePoint += (float)dur.count() / 1000;
-      //  std::cout << time << std::endl;
+        //std::cout << time << std::endl;
 
-        curr_ns += dur;
+        //0 is false and 1 is true
+        if (!bPaused)
+        {
+            curr_ns += dur;
 
 
         if (curr_ns >= timestep){
@@ -189,6 +256,9 @@ int main(void)
         }
         
         pWorld.CheckLifespan(timePoint / converter);
+
+        }
+        
 
         
         //--------DRAW MODEL--------

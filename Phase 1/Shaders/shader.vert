@@ -6,6 +6,9 @@ uniform mat4 transform;
 uniform mat4 projection;
 uniform mat4 view;
 
+uniform mat4 projection_cam;
+uniform mat4 view_cam;
+
 void main ()
 {
 	gl_Position = projection * view * transform * vec4(aPos, 1.0); 
