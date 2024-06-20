@@ -18,15 +18,6 @@ void PhysicsWorld::Update(float time) {
 		)
 	{
 		(*p)->Update(time);
-
-		if (num >= 6) {
-			num = 1;
-
-		}
-		else {
-			num++;
-		}
-	//	std::cout << num << " particle: " << (*p)->getPosition() << std::endl;
 	}
 }
 
@@ -35,7 +26,7 @@ void PhysicsWorld::CheckLifespan(float time) {
 		p != Particles.end();
 		p++)
 	{
-		if ((*p)->lifespan <= time)
+		if ((*p)->lifespan <= (int)time - (int)(*p)->spawnTime)
 			(*p)->Destroy();
 	}
 }

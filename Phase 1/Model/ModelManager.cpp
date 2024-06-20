@@ -14,7 +14,6 @@ void ModelManager::checkModels() {
 		p++
 		)
 	{
-		//(*p)->Update(time);
 
 		if (num >= 6) {
 			num = 1;
@@ -23,10 +22,8 @@ void ModelManager::checkModels() {
 		else {
 			num++;
 		}
-		//if (p == )
-			//std::cout << "NULL " << std::endl;
 		
-	//	std::cout << num << " model: " << (*p)->getPosition() << std::endl;
+		std::cout << num << " model: " << (*p)->getPosition() << std::endl;
 	}
 
 

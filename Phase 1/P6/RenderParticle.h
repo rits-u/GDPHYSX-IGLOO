@@ -16,8 +16,6 @@ namespace P6 {
 			RenderParticle(P6Particle* p, Model3D* model);
 
 			void draw();
-			void debugDraw(int num);
-
 	};
 
 }

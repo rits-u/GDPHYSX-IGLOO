@@ -9,7 +9,7 @@ int Utility::getRandomNumber(int lowerBound, int upperBound) {
 }
 
 glm::vec3 Utility::getRandomVector(int lowerBound[], int upperBound[]) {
-    glm::vec3 vecRng;
+    glm::vec3 vecRng = {};
 
     for (int i = 0; i < 3; i++) {
         int offset = lowerBound[i];

@@ -8,13 +8,13 @@ namespace P6 {
 	class P6Particle
 	{
 		public:
-			float mass = 0;
+			float mass = 1;
 			MyVector Position;
 			MyVector Velocity;
 			MyVector Acceleration;
 			float damping = 0.9f;
 			float lifespan = 10.0f;
-			//std::chrono::seconds lifespan;
+			float spawnTime;
 
 		protected:
 			MyVector accumulatedForce = MyVector(0, 0, 0);
@@ -23,6 +23,7 @@ namespace P6 {
 
 		public:
 			P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration, float lifespan);
+			P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration, float lifespan, float spawnTime);
 
 		protected:
 			void UpdatePosition(float time);
@@ -33,7 +34,7 @@ namespace P6 {
 			void Update(float time);
 			void Destroy();
 			bool IsDestroyed();
-			void AddForce(MyVector force); //adds force to particle
+			void AddForce(MyVector force);
 			void ResetForce();
 			
 			float getPosition(); //FOR DEBUG ONLY
