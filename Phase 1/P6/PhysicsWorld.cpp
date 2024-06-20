@@ -3,20 +3,17 @@ using namespace P6;
 
 void PhysicsWorld::AddParticle(P6Particle* toAdd) {
 	Particles.push_back(toAdd);	
-	forceRegistry.Add(toAdd, &Gravity); //HELP
+	forceRegistry.Add(toAdd, &Gravity); 
 }
 
 void PhysicsWorld::Update(float time) {
 	UpdateParticleList();
-
 	forceRegistry.UpdateForces(time);
 
 	int num = 0;
 
 	for (std::list<P6Particle*>::iterator p = Particles.begin();
-
 		p != Particles.end();
-
 		p++
 		)
 	{
@@ -29,19 +26,17 @@ void PhysicsWorld::Update(float time) {
 		else {
 			num++;
 		}
-		std::cout << num << " particle: " << (*p)->getPosition() << std::endl;
+	//	std::cout << num << " particle: " << (*p)->getPosition() << std::endl;
 	}
 }
 
-void PhysicsWorld::CheckIfDone() {
+void PhysicsWorld::CheckLifespan(float time) {
 	for (std::list<P6Particle*>::iterator p = Particles.begin();
-
 		p != Particles.end();
-
-		p++
-		)
+		p++)
 	{
-		(*p)->IsAtOrigin();
+		if ((*p)->lifespan <= time)
+			(*p)->Destroy();
 	}
 }
 

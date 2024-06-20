@@ -32,7 +32,3 @@ void RenderParticle::debugDraw(int num) {
 	}
 	
 }
-
-void RenderParticle::instantiateParticle() {
-
-}

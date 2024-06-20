@@ -11,16 +11,12 @@ namespace P6 {
 		public:
 			P6Particle* physicsParticle;
 			Model3D* renderObject;
-			//bool isDestroyed;
 
 		public:
 			RenderParticle(P6Particle* p, Model3D* model);
 
 			void draw();
 			void debugDraw(int num);
-			//RenderParticle(P6Particle* p, Model3D* model);
-			void instantiateParticle();
-			void checkSize();
 
 	};
 

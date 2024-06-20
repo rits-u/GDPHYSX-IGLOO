@@ -22,7 +22,7 @@ namespace P6 {
 			bool isDestroyed = false;
 
 		public:
-			P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration);
+			P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration, float lifespan);
 
 		protected:
 			void UpdatePosition(float time);
@@ -33,11 +33,10 @@ namespace P6 {
 			void Update(float time);
 			void Destroy();
 			bool IsDestroyed();
-			bool IsAtOrigin();
 			void AddForce(MyVector force); //adds force to particle
 			void ResetForce();
 			
-			float getPosition();
+			float getPosition(); //FOR DEBUG ONLY
 	};
 }
 

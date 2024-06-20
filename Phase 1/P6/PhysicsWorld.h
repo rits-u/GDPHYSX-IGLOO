@@ -20,10 +20,9 @@ namespace P6 {
 		//Universal update function to call the updates of ALL
 		void Update(float time);
 
-		void CheckIfDone();
+		void CheckLifespan(float time);
 
 	private:
-		//updates the particle list
 		void UpdateParticleList();
 
 		GravityForceGenerator Gravity = GravityForceGenerator(MyVector(0, -9.8, 0));

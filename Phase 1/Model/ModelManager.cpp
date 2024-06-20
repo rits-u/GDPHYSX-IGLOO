@@ -26,7 +26,7 @@ void ModelManager::checkModels() {
 		//if (p == )
 			//std::cout << "NULL " << std::endl;
 		
-		std::cout << num << " model: " << (*p)->getPosition() << std::endl;
+	//	std::cout << num << " model: " << (*p)->getPosition() << std::endl;
 	}
 
 

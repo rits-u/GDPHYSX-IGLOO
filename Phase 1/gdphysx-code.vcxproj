@@ -155,6 +155,7 @@
     <ClCompile Include="P6\MyVector.cpp" />
     <ClCompile Include="P6\PhysicsWorld.cpp" />
     <ClCompile Include="P6\RenderParticle.cpp" />
+    <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="Shaders\shader.frag">
@@ -188,6 +189,7 @@
     <ClInclude Include="P6\PhysicsWorld.h" />
     <ClInclude Include="P6\RenderParticle.h" />
     <ClInclude Include="tiny_obj_loader.h" />
+    <ClInclude Include="Utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

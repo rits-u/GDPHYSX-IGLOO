@@ -1,10 +1,11 @@
 #include "P6Particle.h"
 using namespace P6;
 
-P6Particle::P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration) {
+P6Particle::P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration, float lifespan) {
 	this->Position = Position;
 	this->Velocity = Velocity;
-;	this->Acceleration = Acceleration;
+	this->Acceleration = Acceleration;
+	this->lifespan = lifespan;
 }
 
 
@@ -37,16 +38,6 @@ void P6Particle::Destroy() {
 
 bool P6Particle::IsDestroyed() {
 	return isDestroyed;
-}
-
-bool P6Particle::IsAtOrigin() {
-
-	if ((this->Position.x >= -10.0f && this->Position.x <= 10.0f) &&
-		(this->Position.y >= -10.0f && this->Position.y <= 10.0f)) {
-			
-			return true;
-	}
-	return false;
 }
 
 void P6Particle::AddForce(MyVector force) {
