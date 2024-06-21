@@ -17,12 +17,12 @@ P6Particle::P6Particle(MyVector Position, MyVector Velocity, MyVector Accelerati
 	this->spawnTime = spawnTime;
 }
 
-
+//this function is used for updating the position of the particle
 void P6Particle::UpdatePosition(float time) {
 	this->Position = this->Position + (this->Velocity * time) + ((this->Acceleration * time * time) * (1.0f / 2.0f));
 }
 
-
+//this function is used for updating the velocity of the particle
 void P6Particle::UpdateVelocity(float time) {
 	//A                 =        F         /    m
 	this->Acceleration += accumulatedForce * (1/mass);
@@ -34,6 +34,7 @@ void P6Particle::UpdateVelocity(float time) {
 	this->Velocity = this->Velocity * powf(damping, time);
 }
 
+//this function manages the update of the properties of the particle
 void P6Particle::Update(float time) {
 	this->UpdatePosition(time);
 	this->UpdateVelocity(time);
@@ -41,6 +42,13 @@ void P6Particle::Update(float time) {
 	this->ResetForce();
 }
 
+//this function resets the force so that it won't apply force unnecessarily
+void P6Particle::ResetForce() {
+	this->accumulatedForce = MyVector(0, 0, 0);
+	this->Acceleration = MyVector(0, 0, 0);
+}
+
+//GETERS AND SETTERS
 void P6Particle::Destroy() {
 	this->isDestroyed = true;
 }
@@ -51,11 +59,6 @@ bool P6Particle::IsDestroyed() {
 
 void P6Particle::AddForce(MyVector force) {
 	accumulatedForce += force;
-}
-
-void P6Particle::ResetForce() {
-	this->accumulatedForce = MyVector(0, 0, 0);
-	this->Acceleration = MyVector(0, 0, 0);
 }
 
 float P6Particle::getPosition() {

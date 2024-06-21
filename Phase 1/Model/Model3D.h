@@ -20,6 +20,7 @@ namespace model{
 
 	class Model3D
 	{
+		//FIELDS
 		private:
 			MyVector position;
 			glm::vec3 scale;
@@ -32,21 +33,22 @@ namespace model{
 			glm::mat4 projection;
 			glm::mat4 viewMatrix;
 
-
+		//CONSTRUCTOR
 		public:
 			Model3D();
 			Model3D(glm::vec3 scale, glm::vec4 color, GLuint shaderProg);
 
+		//METHODS
 		public:
 			//void loadModel_(std::string objSrc, tinyobj::attrib_t* attributes, GLuint* VBO);
 			void loadModel(std::string objSrc, GLuint* VBO);
 			void drawModel();
 			
-
 		private:
 			void bindBuffers(tinyobj::attrib_t attributes, GLuint* VBO);
 			void bindCamera(glm::mat4 projection, glm::mat4 viewMatrix);
 
+		//GETTERS AND SETTERS
 		public:
 			void setPosition(MyVector position);
 			void setScale(glm::vec3 scale);

@@ -27,6 +27,7 @@ Model3D::Model3D(glm::vec3 scale, glm::vec4 color, GLuint shaderProg) {
     this->viewMatrix = glm::mat4(1);
 }
 
+//this function loads the model by storing its mesh indices
 void Model3D::loadModel(std::string objSrc, GLuint* VBO) {
     std::string path = objSrc;
     std::vector<tinyobj::shape_t> shapes;
@@ -47,7 +48,7 @@ void Model3D::loadModel(std::string objSrc, GLuint* VBO) {
     this->bindBuffers(attributes, VBO);
 }
  
-
+//this function handles the binding of buffers for the model to be rendered properly
 void Model3D::bindBuffers(tinyobj::attrib_t attributes, GLuint* VBO) {
     GLuint EBO;
     glGenVertexArrays(1, &this->VAO);
@@ -67,7 +68,7 @@ void Model3D::bindBuffers(tinyobj::attrib_t attributes, GLuint* VBO) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-
+//this function manages the transformation and rendering of the model
 void  Model3D::drawModel() {
 
     //bind camera
@@ -119,7 +120,7 @@ void  Model3D::drawModel() {
     glDrawElements(GL_TRIANGLES, this->mesh_indices.size(), GL_UNSIGNED_INT, 0);
 }
 
-
+//this function is for binding the camera properties to the shader
 void Model3D::bindCamera(glm::mat4 projection, glm::mat4 viewMatrix) {
     unsigned int projLoc = glGetUniformLocation(this->shaderProg, "projection");
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
@@ -128,6 +129,7 @@ void Model3D::bindCamera(glm::mat4 projection, glm::mat4 viewMatrix) {
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 }
 
+//GETTERS AND SETTERS
 void Model3D::setPosition(MyVector position) {
     this->position = position;
 }

@@ -6,6 +6,7 @@ float MyVector::getMagnitude() {
 	return sqrt(pow(this->x, 2) + pow(this->y, 2) + pow(this->z, 2));
 }
 
+//NORMALIZATION
 MyVector MyVector::normalize() {
 	float mag = this->getMagnitude();
 	return MyVector(this->x / mag,
@@ -27,6 +28,7 @@ MyVector MyVector::operator+ (const MyVector v) {
 					this->z + v.z);
 }
 
+//ADDITION
 void MyVector::operator+= (const MyVector v) {
 	this->x += v.x;
 	this->y += v.y;
@@ -40,6 +42,7 @@ MyVector MyVector::operator- (const MyVector v) {
 					this->z - v.z);
 }
 
+//SUBTRACTION
 void MyVector::operator-= (const MyVector v) {
 	this->x -= v.x;
 	this->y -= v.y;
@@ -53,6 +56,7 @@ MyVector MyVector::operator* (const float f) {
 					this->z * f);
 }
 
+//SCALAR MULTIPLICATION
 void MyVector::scalarMultiplication (const float f) {
 	this->x *= f;
 	this->y *= f;
@@ -66,6 +70,7 @@ MyVector MyVector::operator* (const MyVector v) {
 					this->z * v.z);
 }
 
+//COMPONENT PRODUCT
 void MyVector::operator*= (const MyVector v) {
 	this->x *= v.x;
 	this->y *= v.y;

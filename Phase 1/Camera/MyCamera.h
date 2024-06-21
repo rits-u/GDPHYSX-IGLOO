@@ -6,9 +6,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
 namespace camera {
 	class MyCamera
 	{
+	
+	//FIELDS
 	protected:
 		float z_far;
 		float z_near;
@@ -17,13 +20,14 @@ namespace camera {
 		glm::mat4 viewEye;
 		glm::mat4 projectionEye;
 
+	//CONSTRUCTOR
 	public:
 		MyCamera();
 
+	//METHODS
 	public:
 		void set_zFar(float z_far);
 		void set_zNear(float z_near);
-
 
 	public:
 		//virtual voids for camera switching

@@ -93,16 +93,21 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     //Pause/Play the game
     else if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
     {
-        if (!bPaused) bPaused = true;
-        else bPaused = false;
-
-        //pause works!
-        // std::cout << "bPausd is " << bPaused << std::endl;
+        if (!bPaused) {
+            bPaused = true;
+            std::cout << "PAUSED" << std::endl;
+        }
+        else {
+            bPaused = false;
+            std::cout << "RESUMED" << std::endl;
+        }
         
     }
  
 }
 
+
+//----------MAIN FUNCTION-----------
 int main(void)
 {
     GLFWwindow* window;
@@ -137,7 +142,7 @@ int main(void)
     glm::mat4 projection = MainCamera->getProjection();
 
 
-
+    //--------DECLARATION OF NEEDED VARIABLES-----------
     P6::PhysicsWorld pWorld = P6::PhysicsWorld();
     ModelManager modelManager = ModelManager();
     std::list<RenderParticle*> RenderParticles;
@@ -145,31 +150,29 @@ int main(void)
     GLuint VAO, VBO;
 
     int numSparks = 0;
-    std::cout << "Input spark count: ";
-    std::cin >> numSparks;
+    int spawned = 0;
 
-
-
-    int vec[3];
     int lowerBoundVel[3] = { -200, 10, -200 };
     int upperBoundVel[3] = { 200, 500, 200 };
     int lowerBoundAcc[3] = { -100, 600, -100 };
     int upperBoundAcc[3] = { 100, 6000, 100 };
+    int lowerBoundCol[3] = { 50, 50, 50 };
+    int upperBoundCol[3] = { 254, 254, 254 };
 
     MyVector defaultSpawn(0, -SCREEN_HEIGHT + 150, 0);
     Utility utility;
 
-    int spawned = 0;
     float timePoint = 0.0f;
-    float converter = 1000000;
-
+    float converter = 1000000;  //used for converting timePoint to seconds
 
     using clock = std::chrono::high_resolution_clock;
     auto curr_time = clock::now();
     auto prev_time = curr_time;
     std::chrono::nanoseconds curr_ns(0);
 
-
+    //asks user for the number of sparks to spawn
+    std::cout << "Input spark count: ";
+    std::cin >> numSparks;
 
     srand((unsigned)time(NULL));
 
@@ -192,75 +195,75 @@ int main(void)
         auto dur = std::chrono::duration_cast<std::chrono::nanoseconds> (curr_time - prev_time);
         prev_time = curr_time;     
        
-        timePoint += (float)dur.count() / 1000;
+        
         //std::cout << time << std::endl;
 
         //0 is false and 1 is true
         if (!bPaused)
         {
             curr_ns += dur;
+            timePoint += (float)dur.count() / 1000;
 
+            if (curr_ns >= timestep){
+                auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(curr_ns);
 
-        if (curr_ns >= timestep){
-            auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(curr_ns);
+                curr_ns -= curr_ns;
 
-            curr_ns -= curr_ns;
+                pWorld.Update((float)ms.count() / 1000);
 
-            pWorld.Update((float)ms.count() / 1000);
+              //  modelManager.checkModels(); FOR DEBUGGING ONLY
 
-          //  modelManager.checkModels(); FOR DEBUGGING ONLY
+                // keep spawning a particle if the number of spawned particles has 
+                // not reached the requested amount of sparks yet
+                if (spawned < numSparks) {
 
+                    //GENERATE LIFESPAN
+                    int lifespan = utility.getRandomNumber(1, 10);
 
-            if (spawned < numSparks) {
+                    //GENERATE VELOCITY
+                    glm::vec3 rngVel = utility.getRandomVector(lowerBoundVel, upperBoundVel);
 
-                //GENERATE LIFESPAN
-                int lifespan = utility.getRandomNumber(1, 10);
+                    //GENERATE ACCELERATION
+                    glm::vec3 rngAcc = utility.getRandomVector(lowerBoundAcc, upperBoundAcc);
 
-                //GENERATE VELOCITY
-                glm::vec3 rngVel = utility.getRandomVector(lowerBoundVel, upperBoundVel);
+                    //INSTANTIATE PARTICLE
+                    P6Particle* particle = new P6Particle(defaultSpawn,
+                            MyVector(rngVel.x, rngVel.y, rngVel.z),
+                            MyVector(rngAcc.x, rngAcc.y, rngAcc.z),
+                            lifespan,
+                            timePoint / converter);
+                    pWorld.AddParticle(particle);
 
-                //GENERATE ACCELERATION
-                glm::vec3 rngAcc = utility.getRandomVector(lowerBoundAcc, upperBoundAcc);
+                    //GENERATE RANDOM COLOR
+                    /*for (int j = 0; j < 3; j++)
+                        vec[j] = utility.getRandomNumber(50, 254);*/
+                    glm::vec3 rngColor = utility.getRandomVector(lowerBoundCol, upperBoundCol);
+                    glm::vec4 colorVec = glm::vec4(rngColor.x / 254.0f, rngColor.y / 254.0f, rngColor.z / 254.0f, 1.0f);
 
-                //INSTANTIATE PARTICLE
-                P6Particle* particle = new P6Particle(defaultSpawn,
-                        MyVector(rngVel.x, rngVel.y, rngVel.z),
-                        MyVector(rngAcc.x, rngAcc.y, rngAcc.z),
-                        lifespan,
-                        timePoint / converter);
-                pWorld.AddParticle(particle);
+                    //GENERATE RADIUS
+                    int radius = utility.getRandomNumber(2, 10);
 
-                //GENERATE RANDOM COLOR
-                for (int j = 0; j < 3; j++)
-                    vec[j] = utility.getRandomNumber(50, 254);
+                    //INSTANTIATE MODEL
+                    Model3D* model = new Model3D(glm::vec3(radius * 2, radius * 2, radius * 2), colorVec, shaderProg);
+                    model->loadModel("3D/sphere.obj", &VBO);
+                    model->setCameraProperties(projection, viewMatrix);
+                    modelManager.AddModel(model);
 
-                glm::vec4 colorVec = glm::vec4(vec[0] / 254.0f, vec[1] / 254.0f, vec[2] / 254.0f, 1.0f);
+                    //INSTANTIATE RENDER_PARTICLE
+                    RenderParticle* rp = new RenderParticle(particle, model);
+                    RenderParticles.push_back(rp);
 
-                //GENERATE RADIUS
-                int radius = utility.getRandomNumber(2, 10);
+                    spawned += 1;
 
-                //INSTANTIATE MODEL
-                Model3D* model = new Model3D(glm::vec3(radius * 2, radius * 2, radius * 2), colorVec, shaderProg);
-                model->loadModel("3D/sphere.obj", &VBO);
-                model->setCameraProperties(projection, viewMatrix);
-                modelManager.AddModel(model);
-
-                //INSTANTIATE RENDER_PARTICLE
-                RenderParticle* rp = new RenderParticle(particle, model);
-                RenderParticles.push_back(rp);
-
-                spawned += 1;
-
-                std::cout << "SPAWNED: " << spawned << std::endl;
+                    std::cout << "SPAWNED: " << spawned << std::endl;
+                }
             }
-        }
         
-        pWorld.CheckLifespan(timePoint / converter);
+            pWorld.CheckLifespan(timePoint / converter);
 
         }
         
 
-        
         //--------DRAW MODEL--------
         int test = 0;
         for (std::list<RenderParticle*>::iterator i = RenderParticles.begin();

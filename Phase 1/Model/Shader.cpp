@@ -16,7 +16,7 @@ GLuint Shader::createShader(std::string fileVert, std::string fileFrag) {
     return shaderProg;
 }
 
-//load vertex and frament shader files
+//load vertex and fragment shader files
 void Shader::loadVertAndFrag(std::string fileVert, std::string fileFrag) {
     std::fstream vertSrc(fileVert);
     if (!vertSrc) {
@@ -45,7 +45,7 @@ void Shader::loadVertAndFrag(std::string fileVert, std::string fileFrag) {
     glCompileShader(this->fragShader);
 }
 
-
+//this method is typically called after shaderProg has been set up
 void Shader::deleteShader() {
     this->vertShader = NULL;
     this->fragShader = NULL;
