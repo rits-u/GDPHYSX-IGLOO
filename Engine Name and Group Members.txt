@@ -1,0 +1,7 @@
+Engine Name: IGLOO
+
+Members:
+Legaspi, Andrea Maxene F.
+Vingno, Jan Elizabeth G.
+
+GitHub Link: https://github.com/rits-u/IGLOO-Phase1
