@@ -148,7 +148,7 @@ int main(void)
     if (!glfwInit())
         return -1;
 
-    window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "hello", NULL, NULL);
+    window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "IGLOO", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -294,7 +294,7 @@ int main(void)
                     spawned += 1;
                     if (spawned >= numSparks && !spawn_done) {
                         spawn_done = true;
-                        std::cout << "SPAWNED: " << spawned << std::endl;
+                        std::cout << std::endl << "SPAWNED: " << spawned << std::endl << std::endl;
                     }
                 }
             }
