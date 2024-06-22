@@ -10,7 +10,6 @@ namespace model {
 		public:
 			std::list<Model3D*> Models;
 			void AddModel(Model3D* toAdd);
-			void checkModels(); //DEBUGGING ONLY
 	};
 
 }

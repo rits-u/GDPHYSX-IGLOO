@@ -40,7 +40,6 @@ namespace model{
 
 		//METHODS
 		public:
-			//void loadModel_(std::string objSrc, tinyobj::attrib_t* attributes, GLuint* VBO);
 			void loadModel(std::string objSrc, GLuint* VBO);
 			void drawModel();
 			

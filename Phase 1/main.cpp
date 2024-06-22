@@ -42,7 +42,11 @@ int SCREEN_WIDTH = 800;
 int SCREEN_HEIGHT = 800;
 
 bool bPaused = false;
-MyCamera* MainCamera = new OrthoCamera();
+
+PerspectiveCamera* persCamera = new PerspectiveCamera();
+OrthoCamera* orthoCamera = new OrthoCamera(-SCREEN_WIDTH, SCREEN_WIDTH, SCREEN_HEIGHT, -SCREEN_HEIGHT);
+
+std::string cameraType = "Ortho";
 
 
 //Key Input Handler
@@ -51,43 +55,72 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     //Orthographic
     if (key == GLFW_KEY_1 && action == GLFW_PRESS)
     {
-        MainCamera = new OrthoCamera();
-        std::cout << "Shifted to Ortho Cam" << std::endl;
+        if (cameraType != "Ortho") {
+            cameraType = "Ortho";
+            std::cout << "Shifted to Ortho Camera" << std::endl;
+            
+        }
+        else {
+            std::cout << "Already using ortho projection" << std::endl;
+        }
     }
 
     //Perspective
     else if (key == GLFW_KEY_2 && action == GLFW_PRESS)
     {
-        MainCamera = new PerspectiveCamera();
-        std::cout << "Shifted to Pers Cam" << std::endl;
-    }
-
-    //Rotate to the left
-    else if (key == GLFW_KEY_A && action == GLFW_PRESS)
-    {
-        
-        std::cout << "Shifted to the left" << std::endl;
-    }
-
-    //Rotate to the right
-    else if (key == GLFW_KEY_D && action == GLFW_PRESS)
-    {
-
-        std::cout << "Shifted to the right" << std::endl;
-    }
-
-    //Rotate upwards
-    else if (key == GLFW_KEY_W && action == GLFW_PRESS)
-    {
-
-        std::cout << "Shifted upwards" << std::endl;
+        if (cameraType != "Perspective") {
+            cameraType = "Perspective";
+            std::cout << "Shifted to Perspective Camera" << std::endl;
+        }
+        else {
+            std::cout << "Already using Perspective projection" << std::endl;
+        }
     }
 
     //Rotate downwards
-    else if (key == GLFW_KEY_S && action == GLFW_PRESS)
+    else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-
+        if (cameraType == "Ortho") {
+            orthoCamera->topMost -= 20;
+        }
+        else {
+            persCamera->cameraPos.x -= 30;
+        }
         std::cout << "Shifted downwards" << std::endl;
+    }
+
+    //Rotate upwards
+    else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        if(cameraType == "Ortho") 
+            orthoCamera->topMost += 20;
+        else 
+            persCamera->cameraPos.x += 30;
+        
+        std::cout << "Shifted upwards" << std::endl;
+    }
+
+    //Rotate to the left
+    else if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) 
+    {
+        if(cameraType == "Ortho")
+            orthoCamera->rightMost += 15;
+        else
+            persCamera->cameraPos.y -= 30;
+
+        std::cout << "Shifted to the left" << std::endl;
+    }
+
+
+    //Rotate to the right
+    else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        if (cameraType == "Ortho")
+            orthoCamera->rightMost -= 15;
+        else
+            persCamera->cameraPos.y += 30;
+
+        std::cout << "Shifted to the right" << std::endl;
     }
 
     //Pause/Play the game
@@ -135,11 +168,6 @@ int main(void)
     glLinkProgram(shaderProg);
     shader->deleteShader();
 
-    //--------ORTHO CAMERA-------
-    //orthoCamera->setPosition(-SCREEN_WIDTH, SCREEN_WIDTH, -SCREEN_HEIGHT, SCREEN_HEIGHT);
-    MainCamera->getPosition();
-    glm::mat4 viewMatrix = MainCamera->getView();
-    glm::mat4 projection = MainCamera->getProjection();
 
 
     //--------DECLARATION OF NEEDED VARIABLES-----------
@@ -151,6 +179,7 @@ int main(void)
 
     int numSparks = 0;
     int spawned = 0;
+    bool spawn_done = false;
 
     int lowerBoundVel[3] = { -200, 10, -200 };
     int upperBoundVel[3] = { 200, 500, 200 };
@@ -161,6 +190,10 @@ int main(void)
 
     MyVector defaultSpawn(0, -SCREEN_HEIGHT + 150, 0);
     Utility utility;
+
+    glm::mat4 viewMatrix = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+
 
     float timePoint = 0.0f;
     float converter = 1000000;  //used for converting timePoint to seconds
@@ -179,10 +212,6 @@ int main(void)
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
-        //to call the updated camera position here when keys 1/2 are pressed
-        MainCamera->getPosition();
-        MainCamera->getProjection();
-        MainCamera->getView();
 
         //Key Callback
         glfwSetKeyCallback(window, key_callback);
@@ -198,7 +227,20 @@ int main(void)
         
         //std::cout << time << std::endl;
 
-        //0 is false and 1 is true
+
+        //--------CAMERA-------
+        if (cameraType == "Perspective") {
+            projection = persCamera->giveProjection(SCREEN_WIDTH, SCREEN_HEIGHT);
+            viewMatrix = persCamera->giveView(1);
+        }
+        else {
+          //  orthoCamera->setPosition(-SCREEN_WIDTH, SCREEN_WIDTH, -SCREEN_HEIGHT, SCREEN_HEIGHT);
+            viewMatrix = orthoCamera->giveView();
+            projection = orthoCamera->giveProjection();
+            
+        }
+
+
         if (!bPaused)
         {
             curr_ns += dur;
@@ -211,19 +253,17 @@ int main(void)
 
                 pWorld.Update((float)ms.count() / 1000);
 
-              //  modelManager.checkModels(); FOR DEBUGGING ONLY
-
                 // keep spawning a particle if the number of spawned particles has 
                 // not reached the requested amount of sparks yet
                 if (spawned < numSparks) {
 
-                    //GENERATE LIFESPAN
+                    //GENERATE RANDOM LIFESPAN
                     int lifespan = utility.getRandomNumber(1, 10);
 
-                    //GENERATE VELOCITY
+                    //GENERATE RANDOM VELOCITY
                     glm::vec3 rngVel = utility.getRandomVector(lowerBoundVel, upperBoundVel);
 
-                    //GENERATE ACCELERATION
+                    //GENERATE RANDOM ACCELERATION
                     glm::vec3 rngAcc = utility.getRandomVector(lowerBoundAcc, upperBoundAcc);
 
                     //INSTANTIATE PARTICLE
@@ -235,12 +275,10 @@ int main(void)
                     pWorld.AddParticle(particle);
 
                     //GENERATE RANDOM COLOR
-                    /*for (int j = 0; j < 3; j++)
-                        vec[j] = utility.getRandomNumber(50, 254);*/
                     glm::vec3 rngColor = utility.getRandomVector(lowerBoundCol, upperBoundCol);
                     glm::vec4 colorVec = glm::vec4(rngColor.x / 254.0f, rngColor.y / 254.0f, rngColor.z / 254.0f, 1.0f);
 
-                    //GENERATE RADIUS
+                    //GENERATE RANDOM RADIUS
                     int radius = utility.getRandomNumber(2, 10);
 
                     //INSTANTIATE MODEL
@@ -254,8 +292,10 @@ int main(void)
                     RenderParticles.push_back(rp);
 
                     spawned += 1;
-
-                    std::cout << "SPAWNED: " << spawned << std::endl;
+                    if (spawned >= numSparks && !spawn_done) {
+                        spawn_done = true;
+                        std::cout << "SPAWNED: " << spawned << std::endl;
+                    }
                 }
             }
         

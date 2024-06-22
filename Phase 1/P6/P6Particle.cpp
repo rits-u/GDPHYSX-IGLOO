@@ -48,19 +48,17 @@ void P6Particle::ResetForce() {
 	this->Acceleration = MyVector(0, 0, 0);
 }
 
-//GETERS AND SETTERS
+//this function sets the flag of the particle on being destroyed
 void P6Particle::Destroy() {
 	this->isDestroyed = true;
 }
 
+//this function tells whether a particle is destroyed or not
 bool P6Particle::IsDestroyed() {
 	return isDestroyed;
 }
 
+//This function updates the accumulated force
 void P6Particle::AddForce(MyVector force) {
 	accumulatedForce += force;
-}
-
-float P6Particle::getPosition() {
-	return this->Position.y;
 }

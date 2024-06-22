@@ -37,8 +37,6 @@ namespace P6 {
 			bool IsDestroyed();
 			void AddForce(MyVector force);
 			void ResetForce();
-			
-			float getPosition(); //FOR DEBUG ONLY
 	};
 }
 

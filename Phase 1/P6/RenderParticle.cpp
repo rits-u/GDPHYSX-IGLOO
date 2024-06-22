@@ -7,7 +7,7 @@ RenderParticle::RenderParticle(P6Particle* p, Model3D* model) {
 	this->renderObject = model;
 }
 
-// this function is used updating the position of the model based on the position 
+// this function is used for updating the position of the model based on the position 
 // of the particle, also used for calling the renderer of the object
 void RenderParticle::draw() {
 	if (!this->physicsParticle->IsDestroyed()) {
