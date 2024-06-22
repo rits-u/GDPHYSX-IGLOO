@@ -4,4 +4,4 @@ Members:
 Legaspi, Andrea Maxene F.
 Vingno, Jan Elizabeth G.
 
-GitHub Link: https://github.com/rits-u/IGLOO-Phase1
+GitHub Link: https://github.com/rits-u/GDPHYSX-IGLOO-Phase1
