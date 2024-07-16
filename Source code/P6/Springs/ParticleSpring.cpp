@@ -7,20 +7,19 @@ ParticleSpring::ParticleSpring(P6Particle* particle, float _springConst, float _
 void ParticleSpring::UpdateForce(P6Particle* particle, float time)
 {
     //Gt current pos of particle
-    VectorClass pos = particle->position;
+    MyVector pos = particle->Position;
 
     //use poistion of other particle instead
     //create vecor pos -> other particle
-    VectorClass force = pos - otherParticle->position;
+    MyVector force = pos - otherParticle->Position;
 
     //get mag of vector above
-    float mag = force.findMagnitude(force.x,force.y);
+    float mag = force.getMagnitude();
 
     float springForce = -springConstant * abs(mag-restLength);
 
     //get dir from particle to anchor point
-    //idk if correct
-    force = force.findDirection(force);
+    force = force.getDirection();
 
     //apply force using direction above
     force = force * springForce;
