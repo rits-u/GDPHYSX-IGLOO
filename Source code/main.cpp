@@ -43,6 +43,7 @@ int SCREEN_HEIGHT = 800;
 
 bool bPaused = false;
 
+MyCamera* mainCamera = new OrthoCamera();
 PerspectiveCamera* persCamera = new PerspectiveCamera();
 OrthoCamera* orthoCamera = new OrthoCamera(-SCREEN_WIDTH, SCREEN_WIDTH, SCREEN_HEIGHT, -SCREEN_HEIGHT);
 
@@ -57,6 +58,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     {
         if (cameraType != "Ortho") {
             cameraType = "Ortho";
+            mainCamera = new OrthoCamera();
             std::cout << "Shifted to Ortho Camera" << std::endl;
             
         }
@@ -70,6 +72,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     {
         if (cameraType != "Perspective") {
             cameraType = "Perspective";
+            mainCamera = new PerspectiveCamera();
             std::cout << "Shifted to Perspective Camera" << std::endl;
         }
         else {
@@ -229,17 +232,22 @@ int main(void)
 
 
         //--------CAMERA-------
-        if (cameraType == "Perspective") {
-            projection = persCamera->giveProjection(SCREEN_WIDTH, SCREEN_HEIGHT);
-            viewMatrix = persCamera->giveView(1);
-        }
-        else {
-          //  orthoCamera->setPosition(-SCREEN_WIDTH, SCREEN_WIDTH, -SCREEN_HEIGHT, SCREEN_HEIGHT);
-            viewMatrix = orthoCamera->giveView();
-            projection = orthoCamera->giveProjection();
+        // if (cameraType == "Perspective") {
+        //     projection = persCamera->giveProjection(SCREEN_WIDTH, SCREEN_HEIGHT);
+        //     viewMatrix = persCamera->giveView(1);
+        // }
+        // else {
+        //   //  orthoCamera->setPosition(-SCREEN_WIDTH, SCREEN_WIDTH, -SCREEN_HEIGHT, SCREEN_HEIGHT);
+        //     viewMatrix = orthoCamera->giveView();
+        //     projection = orthoCamera->giveProjection();
             
-        }
+        //}
 
+        unsigned int viewLoc = glGetUniformLocation(shaderProg, "view");
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mainCamera->getView()));
+
+         unsigned int projectionLoc = glGetUniformLocation(shaderProg, "projection");
+        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(mainCamera->giveProjection()));
 
         if (!bPaused)
         {
@@ -284,8 +292,9 @@ int main(void)
                     //INSTANTIATE MODEL
                     Model3D* model = new Model3D(glm::vec3(radius * 2, radius * 2, radius * 2), colorVec, shaderProg);
                     model->loadModel("3D/sphere.obj", &VBO);
-                    model->setCameraProperties(projection, viewMatrix);
+                    //model->setCameraProperties(projection, viewMatrix);
                     modelManager.AddModel(model);
+                    model->setCameraProperties(mainCamera->giveProjection(), mainCamera->getView());
 
                     //INSTANTIATE RENDER_PARTICLE
                     RenderParticle* rp = new RenderParticle(particle, model);
@@ -299,7 +308,7 @@ int main(void)
                 }
             }
         
-            pWorld.CheckLifespan(timePoint / converter);
+            pWorld.CheckLifespan(timePoint / converter);      
 
         }
         

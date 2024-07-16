@@ -4,15 +4,17 @@ using namespace camera;
 
 
 OrthoCamera::OrthoCamera() {
-	this->leftMost = -1.0f;
-	this->rightMost = 1.0f;
-	this->topMost = 1.0f;
-	this->bottomMost = -1.0f;
+	this->leftMost = -800.0f;
+	this->rightMost = 800.0f;
+	this->topMost = 800.0f;
+	this->bottomMost = -800.0f;
 	this->z_near = -1.0f;
-	this->z_far = 1.0f;
-	this->cameraPos = glm::vec3(1, 1, 1);
+	this->z_far = 1000.0f;
+
+	this->cameraPos = glm::vec3(0, 0, 0);
 	this->worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
-	this->center = glm::vec3(0.0f, 0.0f, 0.0f);
+	this->center = glm::vec3(0.0f, 3.0f, 0.0f);
+	this->projection = glm::ortho(this->leftMost, this->rightMost, this->bottomMost, this->topMost, this->z_near, this->z_far);
 }
 
 OrthoCamera::OrthoCamera(float leftmost, float rightMost, float bottomMost, float topmost) {
@@ -24,7 +26,7 @@ OrthoCamera::OrthoCamera(float leftmost, float rightMost, float bottomMost, floa
 	this->z_far = 1.0f;
 	this->cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
 	this->worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
-	this->center = glm::vec3(0.0f, 0.0f, 0.0f);
+	this->center = glm::vec3(0.0f, 3.0f, 0.0f);
 }
 
 //this function returns the view matrix of orthographic camera

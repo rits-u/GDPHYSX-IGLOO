@@ -22,7 +22,7 @@ namespace camera {
 
 	//METHODS
 	public:
-		glm::mat4 giveProjection(float width, float height);
+		glm::mat4 giveProjection();
 		glm::mat4 giveView(int type);
 
 	};

@@ -10,6 +10,7 @@ namespace P6 {
 		//FIELDS
 		public:
 			float x, y, z;
+			float dot = 0.0f;
 		
 		//CONSTRUCTORS
 		public:
@@ -34,6 +35,7 @@ namespace P6 {
 			void operator*=(const MyVector v);
 			float scalarProduct(const MyVector v);
 			MyVector getCrossProduct(const MyVector v);
+			float getDotProduct(const MyVector v, const MyVector v2);
 
 	};
 }

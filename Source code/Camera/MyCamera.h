@@ -15,10 +15,20 @@ namespace camera {
 		glm::vec3 cameraPos;
 		glm::vec3 worldUp;
 		glm::vec3 center;
+		glm::vec3 F,R,U;
+		glm::mat4 cameraPositionMatrix;
+		glm::mat4 cameraOrientation;
+		glm::mat4 viewMatrix;
+		glm::mat4 projection;
 
 	//CONSTRUCTOR
 	public:
 		MyCamera();
+
+	//GETTER AND SETTERS
+	public:
+		glm::mat4 getView();
+		glm::mat4 giveProjection();
 
 	};
 

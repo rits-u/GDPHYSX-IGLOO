@@ -91,3 +91,10 @@ MyVector MyVector::getCrossProduct (const MyVector v) {
 
 	return crossProduct;
 }
+
+//DOT PRODUCT
+float MyVector::getDotProduct(const MyVector v, const MyVector v2)
+{
+    this->dot = (v.x * v2.x) + (v.y * v2.y) + (v.z * v2.z);
+    return this->dot;
+}
