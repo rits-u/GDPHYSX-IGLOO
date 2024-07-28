@@ -23,7 +23,8 @@ ParticleContact* Rod::GetContact()
     MyVector dir = particles[1]->Position - particles[0]->Position;
 
     //idk if correct
-    dir = dir.getDirection();
+   // dir = dir.getDirection();
+    dir = dir.normalize();
 
     //if current length > set length of the rod
     if (currLen > length)

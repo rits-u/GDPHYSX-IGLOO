@@ -1,6 +1,15 @@
 #include "P6Particle.h"
 using namespace P6;
 
+
+P6Particle::P6Particle() {
+	this->Position = MyVector(0, 0, 0);
+	this->Velocity = MyVector(0, 0, 0);
+	this->Acceleration = MyVector(0, 0, 0);
+	this->lifespan = 10.0f;
+	this->spawnTime = 0.0f;
+}
+
 P6Particle::P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration, float lifespan) {
 	this->Position = Position;
 	this->Velocity = Velocity;
@@ -25,7 +34,7 @@ void P6Particle::UpdatePosition(float time) {
 //this function is used for updating the velocity of the particle
 void P6Particle::UpdateVelocity(float time) {
 	//A                 =        F         /    m
-	this->Acceleration += accumulatedForce * (1/mass);
+	this->Acceleration += accumulatedForce * (1 / mass);
 
 	//Vf           =        V1      +         A
 	this->Velocity = this->Velocity + (this->Acceleration * time);

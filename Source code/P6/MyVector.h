@@ -22,6 +22,7 @@ namespace P6 {
 		//METHODS
 		public:
 			float getMagnitude();
+			float SquareMagnitude();
 			MyVector normalize();
 			MyVector getDirection();
 			MyVector operator+ (const MyVector v);

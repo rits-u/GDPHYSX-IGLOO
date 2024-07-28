@@ -4,14 +4,16 @@ using namespace P6;
 
 float ParticleContact::GetSeparatingSpeed()
 {
-
     //Av
     MyVector velocity = particles[0]->Velocity;
 
-    if(particles[1]) velocity -= particles[1]->Velocity;
+    if (particles[1]) {
+        velocity -= particles[1]->Velocity;
+    }
 
     //idk if correct
-    return velocity.getDotProduct(velocity,contactNormal);
+   // return velocity.getDotProduct(velocity,contactNormal);
+    return velocity.scalarProduct(contactNormal);
 }
 
 void ParticleContact::ResolveVelocity(float time)
@@ -32,10 +34,12 @@ void ParticleContact::ResolveVelocity(float time)
     //get total inverse mass of collsing particles
     //apply impulse based on this later
    float totalMass = (float)1/ particles[0]->mass;
-   if (particles[1]) totalMass += (float)1 / particles[1]->mass;
+   if (particles[1]) 
+       totalMass += (float)1 / particles[1]->mass;
 
    //Invalid collision if total mass is 0 or less
-   if(totalMass <= 0) return;
+   if(totalMass <= 0) 
+      return;
 
    //mag of impuls eneeded to apply in collison
    float impulse_mag = deltaSpeed / totalMass;
@@ -49,9 +53,9 @@ void ParticleContact::ResolveVelocity(float time)
 
    if (particles[1])
    {
-    //Apply impulse in the opposite direction for B
-    MyVector V_b = Impulse * ((float)-1 / particles[1]->mass);
-    particles[1]->Velocity = particles[1]->Velocity + V_b;
+        //Apply impulse in the opposite direction for B
+        MyVector V_b = Impulse * ((float)-1 / particles[1]->mass);
+        particles[1]->Velocity = particles[1]->Velocity + V_b;
    }
 }
 
@@ -71,14 +75,17 @@ void ParticleContact::Resolve(float time){
 void ParticleContact::ResolveInterpenertration(float time)
 {
     //do nothing if depth is 0 or lower == barely touch
-    if (depth <= 0) return;
+    if (depth <= 0) 
+        return;
 
     //total mass of collisions
     float totalMass = (float) 1 / particles[0]->mass;
-    if(particles[1]) totalMass += (float)1 / particles[1]->mass;
+    if(particles[1]) 
+       totalMass += (float)1 / particles[1]->mass;
 
 //invalid collison if total mass is 0 or less
-    if (totalMass <= 0 ) return;
+    if (totalMass <= 0 ) 
+       return;
 
     //higher mass == less likely for the particle to move
         //how much to move / how many units to move per total mass

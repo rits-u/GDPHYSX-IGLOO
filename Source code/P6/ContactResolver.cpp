@@ -25,7 +25,8 @@ void ContactResolver::ResolveContacts(std::vector<P6::ParticleContact*> contacts
                 current_index = 1;
                 curr_min = ss;
 
-                 if (max_depth < contacts[i]->depth) max_depth = contacts[i]->depth;
+                 if (max_depth < contacts[i]->depth) 
+                     max_depth = contacts[i]->depth;
 
             }
 

@@ -1,5 +1,5 @@
 #include "RenderParticle.h"
-using namespace P6; 
+using namespace P6;
 
 //constructor
 RenderParticle::RenderParticle(P6Particle* p, Model3D* model) {
@@ -11,7 +11,10 @@ RenderParticle::RenderParticle(P6Particle* p, Model3D* model) {
 // of the particle, also used for calling the renderer of the object
 void RenderParticle::draw() {
 	if (!this->physicsParticle->IsDestroyed()) {
-		this->renderObject->setPosition(this->physicsParticle->Position);
+		this->renderObject->position = this->physicsParticle->Position;
+		float r = this->physicsParticle->radius;
+		glm::vec3 radius = glm::vec3(r, r, r);
+		this->renderObject->scale = radius;
 		this->renderObject->drawModel();
 	}
 }

@@ -21,7 +21,7 @@ namespace model{
 	class Model3D
 	{
 		//FIELDS
-		private:
+		public:
 			MyVector position;
 			glm::vec3 scale;
 			glm::vec3 axis;

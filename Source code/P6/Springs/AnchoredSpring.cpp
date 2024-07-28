@@ -21,7 +21,8 @@ void AnchoredSpring::UpdateForce(P6Particle* particle, float time)
 
         //get dir from the particle to anchor point
         //idk if correct
-        force = force.getDirection();
+        //force = force.getDirection();
+        force = force.normalize();
 
         //apply force using direction above
         force = force * springForce;

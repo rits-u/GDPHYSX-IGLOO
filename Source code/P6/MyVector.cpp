@@ -6,6 +6,10 @@ float MyVector::getMagnitude() {
 	return sqrt(pow(this->x, 2) + pow(this->y, 2) + pow(this->z, 2));
 }
 
+float MyVector::SquareMagnitude() {
+	return pow(this->x, 2) + pow(this->y, 2) + pow(this->z, 2);
+}
+
 //NORMALIZATION
 MyVector MyVector::normalize() {
 	float mag = this->getMagnitude();

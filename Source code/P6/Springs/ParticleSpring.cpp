@@ -19,7 +19,8 @@ void ParticleSpring::UpdateForce(P6Particle* particle, float time)
     float springForce = -springConstant * abs(mag-restLength);
 
     //get dir from particle to anchor point
-    force = force.getDirection();
+    //force = force.getDirection();
+    force = force.normalize();
 
     //apply force using direction above
     force = force * springForce;

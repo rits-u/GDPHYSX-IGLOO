@@ -9,16 +9,17 @@ namespace P6 {
 	class RenderParticle
 	{
 		//FIELDS
-		public:
-			P6Particle* physicsParticle;
-			Model3D* renderObject;
-		
+	public:
+		P6Particle* physicsParticle;
+		Model3D* renderObject;
+		MyVector Scale;
+
 		//CONSTRUCTOR
-		public:
-			RenderParticle(P6Particle* p, Model3D* model);
+	public:
+		RenderParticle(P6Particle* p, Model3D* model);
 
 		//METHODS
-			void draw();
+		void draw();
 	};
 
 }
