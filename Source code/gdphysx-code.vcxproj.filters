@@ -99,6 +99,12 @@
     <ClCompile Include="P6\ContactResolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="P6\Cable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="P6\Renderline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="Shaders\shader.vert" />
@@ -184,6 +190,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="P6\ContactResolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="P6\Cable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="P6\Renderline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

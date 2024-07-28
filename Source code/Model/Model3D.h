@@ -26,7 +26,7 @@ namespace model{
 			glm::vec3 scale;
 			glm::vec3 axis;
 			glm::vec3 theta;
-			glm::vec4 color;
+			glm::vec4 color = glm::vec4(1,0,0,0);
 			std::vector<GLuint> mesh_indices;
 			GLuint VAO;
 			GLuint shaderProg;

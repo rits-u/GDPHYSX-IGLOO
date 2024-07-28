@@ -26,7 +26,7 @@ namespace P6 {
 		//CONSTRUCTOR
 	public:
 		P6Particle();
-		P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration, float lifespan);
+		P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration);
 		P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration, float lifespan, float spawnTime);
 
 		//METHODS

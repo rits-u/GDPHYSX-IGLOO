@@ -10,7 +10,7 @@ P6Particle::P6Particle() {
 	this->spawnTime = 0.0f;
 }
 
-P6Particle::P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration, float lifespan) {
+P6Particle::P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration) {
 	this->Position = Position;
 	this->Velocity = Velocity;
 	this->Acceleration = Acceleration;

@@ -12,6 +12,9 @@
 #include "Camera/OrthoCamera.h"
 #include "Camera/PerspectiveCamera.h"
 
+#include "P6/Cable.h"
+#include "P6/Renderline.h"
+
 #include "P6/MyVector.h"
 #include "P6/P6Particle.h"
 #include "P6/PhysicsWorld.h"
@@ -41,7 +44,9 @@ using namespace utility;
 int SCREEN_WIDTH = 800;
 int SCREEN_HEIGHT = 800;
 
-bool bPaused = false;
+/*INPUT DELCARATION*/
+bool bStart = false;
+float cableLength, particleGap, particleRadius, gravityStrength, forceX, forceY, forceZ;
 
 MyCamera* mainCamera = new OrthoCamera();
 PerspectiveCamera* persCamera = new PerspectiveCamera();
@@ -60,7 +65,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             cameraType = "Ortho";
             mainCamera = new OrthoCamera();
             std::cout << "Shifted to Ortho Camera" << std::endl;
-            
+
         }
         else {
             std::cout << "Already using ortho projection" << std::endl;
@@ -95,18 +100,18 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     //Rotate upwards
     else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        if(cameraType == "Ortho") 
+        if (cameraType == "Ortho")
             orthoCamera->topMost += 20;
-        else 
+        else
             persCamera->cameraPos.x += 30;
-        
+
         std::cout << "Shifted upwards" << std::endl;
     }
 
     //Rotate to the left
-    else if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) 
+    else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        if(cameraType == "Ortho")
+        if (cameraType == "Ortho")
             orthoCamera->rightMost += 15;
         else
             persCamera->cameraPos.y -= 30;
@@ -126,20 +131,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         std::cout << "Shifted to the right" << std::endl;
     }
 
-    //Pause/Play the game
+    //Start
     else if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
     {
-        if (!bPaused) {
-            bPaused = true;
-            std::cout << "PAUSED" << std::endl;
+        if (!bStart) {
+            bStart = true;
+            std::cout << "SIMULATION STARTED" << std::endl;
         }
-        else {
-            bPaused = false;
-            std::cout << "RESUMED" << std::endl;
-        }
-        
+
     }
- 
+
 }
 
 
@@ -161,8 +162,6 @@ int main(void)
     glfwMakeContextCurrent(window);
     gladLoadGL();
 
-  
-
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     //--------CREATE SHADER--------
@@ -177,22 +176,9 @@ int main(void)
     P6::PhysicsWorld pWorld = P6::PhysicsWorld();
     ModelManager modelManager = ModelManager();
     std::list<RenderParticle*> RenderParticles;
+    P6::GravityForceGenerator Gravity = P6::GravityForceGenerator(P6::MyVector(0, 0, 0));
 
     GLuint VAO, VBO;
-
-    int numSparks = 0;
-    int spawned = 0;
-    bool spawn_done = false;
-
-    int lowerBoundVel[3] = { -200, 10, -200 };
-    int upperBoundVel[3] = { 200, 500, 200 };
-    int lowerBoundAcc[3] = { -100, 600, -100 };
-    int upperBoundAcc[3] = { 100, 6000, 100 };
-    int lowerBoundCol[3] = { 50, 50, 50 };
-    int upperBoundCol[3] = { 254, 254, 254 };
-
-    MyVector defaultSpawn(0, -SCREEN_HEIGHT + 150, 0);
-    Utility utility;
 
     glm::mat4 viewMatrix = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);
@@ -206,9 +192,85 @@ int main(void)
     auto prev_time = curr_time;
     std::chrono::nanoseconds curr_ns(0);
 
-    //asks user for the number of sparks to spawn
-    std::cout << "Input spark count: ";
-    std::cin >> numSparks;
+    /*ASKING USER INPUT */
+    std::cout << "Cable Length: ";
+    std::cin >> cableLength;
+
+    std::cout << "Particle Gap: ";
+    std::cin >> particleGap;
+
+    std::cout << "Particle Radius: ";
+    std::cin >> particleRadius;
+
+    std::cout << "GravityStrength: ";
+    std::cin >> gravityStrength;
+
+    std::cout << "Apply Force" << std::endl << "x:";
+    std::cin >> forceX;
+    std::cout << "y:";
+    std::cin >> forceY;
+    std::cout << "z:";
+    std::cin >> forceZ;
+
+    /*PARTICLE DECLARATION*/
+    P6::P6Particle* p1 = new P6::P6Particle(MyVector(0, 0 + particleGap, 0), MyVector(0, 0, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p2 = new P6::P6Particle(MyVector(0, 30 + particleGap, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p3 = new P6::P6Particle(MyVector(-30 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p4 = new P6::P6Particle(MyVector(60 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p5 = new P6::P6Particle(MyVector(-60 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+
+    pWorld.AddParticle(p2);
+    // pWorld.AddParticle(p3);
+    // pWorld.AddParticle(p4);
+    // pWorld.AddParticle(p5);    
+
+    /*PARITCLE RENDERING*/
+    Model3D* m1 = new Model3D(glm::vec3(particleRadius, particleRadius, particleRadius), glm::vec4(1, 0, 0, 0), shaderProg);
+    m1->loadModel("3D/sphere.obj", &VBO);
+    modelManager.AddModel(m1);
+
+    // Model3D* m2 = new Model3D(glm::vec3(particleRadius, particleRadius, particleRadius), glm::vec4(1,0,0,0), shaderProg);
+    // m2->loadModel("3D/sphere.obj", &VBO);
+    // modelManager.AddModel(m2);
+
+    // Model3D* m3 = new Model3D(glm::vec3(particleRadius, particleRadius, particleRadius), glm::vec4(1,0,0,0), shaderProg);
+    // m3->loadModel("3D/sphere.obj", &VBO);
+    // modelManager.AddModel(m3);
+
+    // Model3D* m4 = new Model3D(glm::vec3(particleRadius, particleRadius, particleRadius), glm::vec4(1,0,0,0), shaderProg);
+    // m4->loadModel("3D/sphere.obj", &VBO);
+    // modelManager.AddModel(m4);
+
+    // Model3D* m5 = new Model3D(glm::vec3(particleRadius, particleRadius, particleRadius), glm::vec4(1,0,0,0), shaderProg);
+    // m5->loadModel("3D/sphere.obj", &VBO);
+    // modelManager.AddModel(m5);
+
+    RenderParticle* rp1 = new RenderParticle(p1, m1);
+    RenderParticles.push_back(rp1);
+    RenderParticle* rp2 = new RenderParticle(p2, m1);
+    RenderParticles.push_back(rp2);
+    // RenderParticle* rp3 = new RenderParticle(p3, m1);
+    // RenderParticles.push_back(rp3);
+    // RenderParticle* rp4 = new RenderParticle(p4, m1);
+    // RenderParticles.push_back(rp4);
+    // RenderParticle* rp5 = new RenderParticle(p5, m1);
+    // RenderParticles.push_back(rp5);
+
+    // Cable* cable = new Cable(cableLength);
+    // //pWorld.forceRegistry.Add(p1,cable);
+    // pWorld.forceRegistry.Add(p2, cable);
+    // // pWorld.forceRegistry.Add(p3,cable);
+    // // pWorld.forceRegistry.Add(p4,cable);
+    // // pWorld.forceRegistry.Add(p5,cable);
+
+    // P6::Rod*r = new P6::Rod();
+    // r->particles[0] = p1;
+    // r->particles[1] = p2;
+    // r->length = 100;
+    // pWorld.Links.push_back(r);
+
+
+    Renderline* renderl = new Renderline(MyVector(0, p2->Position.y, 0), MyVector(0, cableLength, 0), shaderProg);
 
     srand((unsigned)time(NULL));
 
@@ -223,95 +285,37 @@ int main(void)
 
 
         //FIXED UPDATE
-        curr_time = clock::now();       
+        curr_time = clock::now();
         auto dur = std::chrono::duration_cast<std::chrono::nanoseconds> (curr_time - prev_time);
-        prev_time = curr_time;     
-       
-        
-        //std::cout << time << std::endl;
-
-
-        //--------CAMERA-------
-        // if (cameraType == "Perspective") {
-        //     projection = persCamera->giveProjection(SCREEN_WIDTH, SCREEN_HEIGHT);
-        //     viewMatrix = persCamera->giveView(1);
-        // }
-        // else {
-        //   //  orthoCamera->setPosition(-SCREEN_WIDTH, SCREEN_WIDTH, -SCREEN_HEIGHT, SCREEN_HEIGHT);
-        //     viewMatrix = orthoCamera->giveView();
-        //     projection = orthoCamera->giveProjection();
-            
-        //}
+        prev_time = curr_time;
 
         unsigned int viewLoc = glGetUniformLocation(shaderProg, "view");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mainCamera->getView()));
 
-         unsigned int projectionLoc = glGetUniformLocation(shaderProg, "projection");
+        unsigned int projectionLoc = glGetUniformLocation(shaderProg, "projection");
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(mainCamera->giveProjection()));
 
-        if (!bPaused)
+        if (bStart)
         {
             curr_ns += dur;
             timePoint += (float)dur.count() / 1000;
 
-            if (curr_ns >= timestep){
+            if (curr_ns >= timestep) {
                 auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(curr_ns);
 
                 curr_ns -= curr_ns;
 
                 pWorld.Update((float)ms.count() / 1000);
 
-                // keep spawning a particle if the number of spawned particles has 
-                // not reached the requested amount of sparks yet
-                if (spawned < numSparks) {
-
-                    //GENERATE RANDOM LIFESPAN
-                    int lifespan = utility.getRandomNumber(1, 10);
-
-                    //GENERATE RANDOM VELOCITY
-                    glm::vec3 rngVel = utility.getRandomVector(lowerBoundVel, upperBoundVel);
-
-                    //GENERATE RANDOM ACCELERATION
-                    glm::vec3 rngAcc = utility.getRandomVector(lowerBoundAcc, upperBoundAcc);
-
-                    //INSTANTIATE PARTICLE
-                    P6Particle* particle = new P6Particle(defaultSpawn,
-                            MyVector(rngVel.x, rngVel.y, rngVel.z),
-                            MyVector(rngAcc.x, rngAcc.y, rngAcc.z),
-                            lifespan,
-                            timePoint / converter);
-                    pWorld.AddParticle(particle);
-
-                    //GENERATE RANDOM COLOR
-                    glm::vec3 rngColor = utility.getRandomVector(lowerBoundCol, upperBoundCol);
-                    glm::vec4 colorVec = glm::vec4(rngColor.x / 254.0f, rngColor.y / 254.0f, rngColor.z / 254.0f, 1.0f);
-
-                    //GENERATE RANDOM RADIUS
-                    int radius = utility.getRandomNumber(2, 10);
-
-                    //INSTANTIATE MODEL
-                    Model3D* model = new Model3D(glm::vec3(radius * 2, radius * 2, radius * 2), colorVec, shaderProg);
-                    model->loadModel("3D/sphere.obj", &VBO);
-                    //model->setCameraProperties(projection, viewMatrix);
-                    modelManager.AddModel(model);
-                    model->setCameraProperties(mainCamera->giveProjection(), mainCamera->getView());
-
-                    //INSTANTIATE RENDER_PARTICLE
-                    RenderParticle* rp = new RenderParticle(particle, model);
-                    RenderParticles.push_back(rp);
-
-                    spawned += 1;
-                    if (spawned >= numSparks && !spawn_done) {
-                        spawn_done = true;
-                        std::cout << std::endl << "SPAWNED: " << spawned << std::endl << std::endl;
-                    }
-                }
+                m1->setCameraProperties(mainCamera->giveProjection(), mainCamera->getView());
+                // m2->setCameraProperties(mainCamera->giveProjection(), mainCamera->getView());
+                // m3->setCameraProperties(mainCamera->giveProjection(), mainCamera->getView());
+                // m4->setCameraProperties(mainCamera->giveProjection(), mainCamera->getView());
+                // m5->setCameraProperties(mainCamera->giveProjection(), mainCamera->getView());
+                renderl->Update(MyVector(p2->Position.x, 0, 0), MyVector(0, cableLength, 0), mainCamera->giveProjection());
             }
-        
-            pWorld.CheckLifespan(timePoint / converter);      
-
         }
-        
+
 
         //--------DRAW MODEL--------
         int test = 0;
@@ -322,7 +326,7 @@ int main(void)
 
             (*i)->draw();
         }
-       
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
