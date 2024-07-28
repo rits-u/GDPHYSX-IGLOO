@@ -14,7 +14,7 @@ namespace P6
     class Cable  : public ForceGenerator, ParticleLink//: public AnchoredSpring, Rod
     {
         private:
-        MyVector handlePoint;
+        MyVector handlePoint = MyVector(0,0,0);
         float cableLength, lineConstant;
         P6Particle* particle;
         Rod* rod;
@@ -28,12 +28,5 @@ namespace P6
         void UpdateForce(P6Particle* particle, float time) override;
 
         float getCableLength();
-
-        /*RODS CLASSES*/
-        // float length = 1;
-        // float restitution = 0.9;
-        // ParticleContact* GetContact() override;
-
-
     };
 }

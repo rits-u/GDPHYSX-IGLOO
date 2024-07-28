@@ -15,15 +15,13 @@ ParticleContact* Rod::GetContact()
 
     //create contact
     ParticleContact* ret = new ParticleContact();
-
+    
     ret->particles[0] = particles[0];
     ret->particles[1] = particles[1];
 
     //get direction of the contact
     MyVector dir = particles[1]->Position - particles[0]->Position;
 
-    //idk if correct
-   // dir = dir.getDirection();
     dir = dir.normalize();
 
     //if current length > set length of the rod

@@ -176,7 +176,7 @@ int main(void)
     P6::PhysicsWorld pWorld = P6::PhysicsWorld();
     ModelManager modelManager = ModelManager();
     std::list<RenderParticle*> RenderParticles;
-    P6::GravityForceGenerator Gravity = P6::GravityForceGenerator(P6::MyVector(0, 0, 0));
+    P6::GravityForceGenerator Gravity = P6::GravityForceGenerator(P6::MyVector(0,0,0));
 
     GLuint VAO, VBO;
 
@@ -212,63 +212,81 @@ int main(void)
     std::cout << "z:";
     std::cin >> forceZ;
 
-    /*PARTICLE DECLARATION*/
-    P6::P6Particle* p1 = new P6::P6Particle(MyVector(0, 0 + particleGap, 0), MyVector(0, 0, 0), MyVector(0, 0, 0));
-    P6::P6Particle* p2 = new P6::P6Particle(MyVector(0, 30 + particleGap, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
-    P6::P6Particle* p3 = new P6::P6Particle(MyVector(-30 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
-    P6::P6Particle* p4 = new P6::P6Particle(MyVector(60 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
-    P6::P6Particle* p5 = new P6::P6Particle(MyVector(-60 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+    /*PARTICLE DECLARATION FOR ANCHORS*/
+    /*These anchor particles will be invisble, to hold the render particles that we see on screen*/
+    P6::P6Particle* p1 = new P6::P6Particle(MyVector(0,0,0), MyVector(0,0,0), MyVector(0, 0, 0));
+    P6::P6Particle* p2 = new P6::P6Particle(MyVector(30 + particleGap,0, 0), MyVector(0, 0, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p3 = new P6::P6Particle(MyVector(-30 + particleGap, 0, 0), MyVector(0, 0, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p4 = new P6::P6Particle(MyVector(60 + particleGap, 0, 0), MyVector(0, 0, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p5 = new P6::P6Particle(MyVector(-60 + particleGap, 0, 0), MyVector(0, 0, 0), MyVector(0, 0, 0));
 
-    pWorld.AddParticle(p2);
-    // pWorld.AddParticle(p3);
-    // pWorld.AddParticle(p4);
-    // pWorld.AddParticle(p5);    
+    /*These anchor particles will be seen on screen*/
+    P6::P6Particle* p6 = new P6::P6Particle(MyVector(0,0,0), MyVector(0,0,0), MyVector(0, 0, 0));
+    P6::P6Particle* p7 = new P6::P6Particle(MyVector(30 + particleGap,0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p8 = new P6::P6Particle(MyVector(-30 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p9 = new P6::P6Particle(MyVector(60 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p10 = new P6::P6Particle(MyVector(-60 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+
+    pWorld.AddParticle(p6);
+    pWorld.AddParticle(p7);
+    pWorld.AddParticle(p8);
+    pWorld.AddParticle(p9); 
+    pWorld.AddParticle(p10); 
 
     /*PARITCLE RENDERING*/
     Model3D* m1 = new Model3D(glm::vec3(particleRadius, particleRadius, particleRadius), glm::vec4(1, 0, 0, 0), shaderProg);
     m1->loadModel("3D/sphere.obj", &VBO);
     modelManager.AddModel(m1);
 
-    // Model3D* m2 = new Model3D(glm::vec3(particleRadius, particleRadius, particleRadius), glm::vec4(1,0,0,0), shaderProg);
-    // m2->loadModel("3D/sphere.obj", &VBO);
-    // modelManager.AddModel(m2);
-
-    // Model3D* m3 = new Model3D(glm::vec3(particleRadius, particleRadius, particleRadius), glm::vec4(1,0,0,0), shaderProg);
-    // m3->loadModel("3D/sphere.obj", &VBO);
-    // modelManager.AddModel(m3);
-
-    // Model3D* m4 = new Model3D(glm::vec3(particleRadius, particleRadius, particleRadius), glm::vec4(1,0,0,0), shaderProg);
-    // m4->loadModel("3D/sphere.obj", &VBO);
-    // modelManager.AddModel(m4);
-
-    // Model3D* m5 = new Model3D(glm::vec3(particleRadius, particleRadius, particleRadius), glm::vec4(1,0,0,0), shaderProg);
-    // m5->loadModel("3D/sphere.obj", &VBO);
-    // modelManager.AddModel(m5);
-
-    RenderParticle* rp1 = new RenderParticle(p1, m1);
+    RenderParticle* rp1 = new RenderParticle(p6, m1);
     RenderParticles.push_back(rp1);
-    RenderParticle* rp2 = new RenderParticle(p2, m1);
+    RenderParticle* rp2 = new RenderParticle(p7, m1);
     RenderParticles.push_back(rp2);
-    // RenderParticle* rp3 = new RenderParticle(p3, m1);
-    // RenderParticles.push_back(rp3);
-    // RenderParticle* rp4 = new RenderParticle(p4, m1);
-    // RenderParticles.push_back(rp4);
-    // RenderParticle* rp5 = new RenderParticle(p5, m1);
-    // RenderParticles.push_back(rp5);
+    RenderParticle* rp3 = new RenderParticle(p8, m1);
+    RenderParticles.push_back(rp3);
+    RenderParticle* rp4 = new RenderParticle(p9, m1);
+    RenderParticles.push_back(rp4);
+    RenderParticle* rp5 = new RenderParticle(p10, m1);
+    RenderParticles.push_back(rp5);
 
-    // Cable* cable = new Cable(cableLength);
-    // //pWorld.forceRegistry.Add(p1,cable);
-    // pWorld.forceRegistry.Add(p2, cable);
-    // // pWorld.forceRegistry.Add(p3,cable);
-    // // pWorld.forceRegistry.Add(p4,cable);
-    // // pWorld.forceRegistry.Add(p5,cable);
+    // The cables hold on to the invisible spheres
+    Cable* cable = new Cable(cableLength);
+    pWorld.forceRegistry.Add(p1,cable);
+    pWorld.forceRegistry.Add(p2,cable);
+    pWorld.forceRegistry.Add(p3,cable);
+    pWorld.forceRegistry.Add(p4,cable);
+    pWorld.forceRegistry.Add(p5,cable);
 
-    // P6::Rod*r = new P6::Rod();
-    // r->particles[0] = p1;
-    // r->particles[1] = p2;
-    // r->length = 100;
-    // pWorld.Links.push_back(r);
+    P6::Rod* r1 = new P6::Rod();
+    r1->particles[0] = p1;
+    r1->particles[1] = p6;
+    r1->length = 100;
 
+    P6::Rod* r2 = new P6::Rod();
+    r2->particles[0] = p2;
+    r2->particles[1] = p7;
+    r2->length = 100;
+    pWorld.Links.push_back(r2);
+
+    P6::Rod* r3 = new P6::Rod();
+    r3->particles[0] = p3;
+    r3->particles[1] = p8;
+    r3->length = 100;
+    pWorld.Links.push_back(r3);
+
+    P6::Rod* r4 = new P6::Rod();
+    r4->particles[0] = p4;
+    r4->particles[1] = p9;
+    r4->length = 100;
+    pWorld.Links.push_back(r4);
+
+    P6::Rod* r5 = new P6::Rod();
+    r5->particles[0] = p5;
+    r5->particles[1] = p10;
+    r5->length = 100;
+    pWorld.Links.push_back(r5);
+    
+    p10->AddForce(P6::MyVector(0,6000,0));
 
     Renderline* renderl = new Renderline(MyVector(0, p2->Position.y, 0), MyVector(0, cableLength, 0), shaderProg);
 
@@ -308,10 +326,6 @@ int main(void)
                 pWorld.Update((float)ms.count() / 1000);
 
                 m1->setCameraProperties(mainCamera->giveProjection(), mainCamera->getView());
-                // m2->setCameraProperties(mainCamera->giveProjection(), mainCamera->getView());
-                // m3->setCameraProperties(mainCamera->giveProjection(), mainCamera->getView());
-                // m4->setCameraProperties(mainCamera->giveProjection(), mainCamera->getView());
-                // m5->setCameraProperties(mainCamera->giveProjection(), mainCamera->getView());
                 renderl->Update(MyVector(p2->Position.x, 0, 0), MyVector(0, cableLength, 0), mainCamera->giveProjection());
             }
         }

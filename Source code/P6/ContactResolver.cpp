@@ -7,7 +7,6 @@ ContactResolver::ContactResolver(unsigned _maxIterations) : max_iterations(_maxI
 
 void ContactResolver::ResolveContacts(std::vector<P6::ParticleContact*> contacts, float time)
 {
-
     current_iterations = 0;
 
     while(current_iterations < max_iterations)

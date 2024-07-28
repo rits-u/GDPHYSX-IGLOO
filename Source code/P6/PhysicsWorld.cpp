@@ -22,7 +22,7 @@ void PhysicsWorld::Update(float time) {
 		(*p)->Update(time);
 	}
 
-	GenerateContacts();
+	//GenerateContacts();
 
 	if (Contacts.size() > 0) {
 		contactResolver.ResolveContacts(Contacts, time);

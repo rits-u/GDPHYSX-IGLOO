@@ -17,8 +17,8 @@ namespace P6
         void ResolveContacts(std::vector<ParticleContact*> contacts, float time);
 
         protected:
-            //Current number of Resolve calls
-            unsigned current_iterations = 0;
+        //Current number of Resolve calls
+        unsigned current_iterations = 0;
 
     };
 
