@@ -176,7 +176,7 @@ int main(void)
     P6::PhysicsWorld pWorld = P6::PhysicsWorld();
     ModelManager modelManager = ModelManager();
     std::list<RenderParticle*> RenderParticles;
-    P6::GravityForceGenerator Gravity = P6::GravityForceGenerator(P6::MyVector(0,0,0));
+    P6::GravityForceGenerator Gravity = P6::GravityForceGenerator(P6::MyVector(0,-9.8,0));
 
     GLuint VAO, VBO;
 
@@ -214,15 +214,15 @@ int main(void)
 
     /*PARTICLE DECLARATION FOR ANCHORS*/
     /*These anchor particles will be invisble, to hold the render particles that we see on screen*/
-    P6::P6Particle* p1 = new P6::P6Particle(MyVector(0,0,0), MyVector(0,0,0), MyVector(0, 0, 0));
-    P6::P6Particle* p2 = new P6::P6Particle(MyVector(30 + particleGap,0, 0), MyVector(0, 0, 0), MyVector(0, 0, 0));
-    P6::P6Particle* p3 = new P6::P6Particle(MyVector(-30 + particleGap, 0, 0), MyVector(0, 0, 0), MyVector(0, 0, 0));
-    P6::P6Particle* p4 = new P6::P6Particle(MyVector(60 + particleGap, 0, 0), MyVector(0, 0, 0), MyVector(0, 0, 0));
-    P6::P6Particle* p5 = new P6::P6Particle(MyVector(-60 + particleGap, 0, 0), MyVector(0, 0, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p1 = new P6::P6Particle(MyVector(0,0,0), MyVector(0,10,0), MyVector(0, 0, 0));
+    P6::P6Particle* p2 = new P6::P6Particle(MyVector(30 + particleGap,0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p3 = new P6::P6Particle(MyVector(-30 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p4 = new P6::P6Particle(MyVector(60 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p5 = new P6::P6Particle(MyVector(-60 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
 
     /*These anchor particles will be seen on screen*/
-    P6::P6Particle* p6 = new P6::P6Particle(MyVector(0,0,0), MyVector(0,0,0), MyVector(0, 0, 0));
-    P6::P6Particle* p7 = new P6::P6Particle(MyVector(30 + particleGap,0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+    P6::P6Particle* p6 = new P6::P6Particle(MyVector(30 + particleGap,0,0), MyVector(0,10,0), MyVector(0, 0, 0));
+    P6::P6Particle* p7 = new P6::P6Particle(MyVector(0,30 + particleGap, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
     P6::P6Particle* p8 = new P6::P6Particle(MyVector(-30 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
     P6::P6Particle* p9 = new P6::P6Particle(MyVector(60 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
     P6::P6Particle* p10 = new P6::P6Particle(MyVector(-60 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
@@ -250,12 +250,12 @@ int main(void)
     RenderParticles.push_back(rp5);
 
     // The cables hold on to the invisible spheres
-    Cable* cable = new Cable(cableLength);
-    pWorld.forceRegistry.Add(p1,cable);
-    pWorld.forceRegistry.Add(p2,cable);
-    pWorld.forceRegistry.Add(p3,cable);
-    pWorld.forceRegistry.Add(p4,cable);
-    pWorld.forceRegistry.Add(p5,cable);
+    // Cable* cable = new Cable(cableLength);
+    // pWorld.forceRegistry.Add(p1,cable);
+    // pWorld.forceRegistry.Add(p2,cable);
+    // pWorld.forceRegistry.Add(p3,cable);
+    // pWorld.forceRegistry.Add(p4,cable);
+    // pWorld.forceRegistry.Add(p5,cable);
 
     P6::Rod* r1 = new P6::Rod();
     r1->particles[0] = p1;
@@ -286,22 +286,17 @@ int main(void)
     r5->length = 100;
     pWorld.Links.push_back(r5);
     
-    p10->AddForce(P6::MyVector(0,6000,0));
+    // p10->AddForce(P6::MyVector(0,6000,0));
 
-    Renderline* renderl = new Renderline(MyVector(0, p2->Position.y, 0), MyVector(0, cableLength, 0), shaderProg);
+    //Renderline* renderl = new Renderline(MyVector(0, p2->Position.x, 0), MyVector(0, cableLength, 0), shaderProg);
 
     srand((unsigned)time(NULL));
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
-
-        //Key Callback
-        glfwSetKeyCallback(window, key_callback);
-
-        glClear(GL_COLOR_BUFFER_BIT);
-
-
+        if (bStart)
+        {
         //FIXED UPDATE
         curr_time = clock::now();
         auto dur = std::chrono::duration_cast<std::chrono::nanoseconds> (curr_time - prev_time);
@@ -313,8 +308,6 @@ int main(void)
         unsigned int projectionLoc = glGetUniformLocation(shaderProg, "projection");
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(mainCamera->giveProjection()));
 
-        if (bStart)
-        {
             curr_ns += dur;
             timePoint += (float)dur.count() / 1000;
 
@@ -326,20 +319,23 @@ int main(void)
                 pWorld.Update((float)ms.count() / 1000);
 
                 m1->setCameraProperties(mainCamera->giveProjection(), mainCamera->getView());
-                renderl->Update(MyVector(p2->Position.x, 0, 0), MyVector(0, cableLength, 0), mainCamera->giveProjection());
+               //renderl->Update(MyVector(p2->Position.x, 0, 0), MyVector(0, cableLength, 0), mainCamera->giveProjection());
+            }
+
+            //--------DRAW MODEL-------
+            for (std::list<RenderParticle*>::iterator i = RenderParticles.begin();
+                i != RenderParticles.end();
+                i++
+                ) {
+
+                (*i)->draw();
             }
         }
 
+        //Key Callback
+        glfwSetKeyCallback(window, key_callback);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-        //--------DRAW MODEL--------
-        int test = 0;
-        for (std::list<RenderParticle*>::iterator i = RenderParticles.begin();
-            i != RenderParticles.end();
-            i++
-            ) {
-
-            (*i)->draw();
-        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();

@@ -15,14 +15,14 @@ void Cable::UpdateForce(P6Particle* particle, float time)
 
     float mag = force.getMagnitude();
 
-    float springForce = -10 * abs(mag - cableLength);
+    float springForce = -1 * abs(mag - cableLength);
 
     force = force.normalize();
 
     force = force * springForce;
 
     particle->AddForce(force);
-       if (pos.y <= cableLength)
+       if (pos.y <= -cableLength)
     {
         std::cout << "hello" << std::endl;
         return;
