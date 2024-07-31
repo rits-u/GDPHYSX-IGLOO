@@ -1,4 +1,4 @@
-# GDPHYSX PHASE 1
+# GDPHYSX MP
 
 Engine Name: IGLOO
 
