@@ -1,70 +1,68 @@
+#include <string>
 #include <iostream>
-#include <math.h>
-#include <iomanip>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#define TINYOBJLOADER_IMPLEMENTATION
+//#include "tiny_obj_loader.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
+
+
 #include "Model/Model3D.h"
 #include "Model/Shader.h"
-#include "Model/ModelManager.h"
-#include "Camera/MyCamera.h"
-#include "Camera/OrthoCamera.h"
-#include "Camera/PerspectiveCamera.h"
-
-#include "P6/Cable.h"
-#include "P6/Renderline.h"
+#include "Model/Camera.h"
 
 #include "P6/MyVector.h"
 #include "P6/P6Particle.h"
 #include "P6/PhysicsWorld.h"
 #include "P6/RenderParticle.h"
+#include "P6/ParticleContact.h"
 
-#include "Utility.h"
+#include "P6/Springs/AnchoredSpring.h"
+#include "P6/Springs/ParticleSpring.h"
 
-//openGL
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "P6/Links/Rod.h"
+#include "P6/Links/Cable.h"
 
-//obj loader
-#define TINYOBJLOADER_IMPLEMENTATION
-#include "tiny_obj_loader.h"
+
+#include "Utility/RenderLine.h"
 
 #include <chrono>
 using namespace std::chrono_literals;
 constexpr std::chrono::nanoseconds timestep(16ms);
 
 using namespace model;
-using namespace camera;
+using namespace P6;
 using namespace utility;
 
-int SCREEN_WIDTH = 800;
-int SCREEN_HEIGHT = 800;
+//SCREEN SIZE
+float width = 800.0f;
+float height = 800.0f;
 
-/*INPUT DELCARATION*/
-bool bStart = false;
-float cableLength, particleGap, particleRadius, gravityStrength, forceX, forceY, forceZ;
+//FOR CAMERA ROTATION
+float rotate = 0.0f;
 
-MyCamera* mainCamera = new OrthoCamera();
-PerspectiveCamera* persCamera = new PerspectiveCamera();
-OrthoCamera* orthoCamera = new OrthoCamera(-SCREEN_WIDTH, SCREEN_WIDTH, SCREEN_HEIGHT, -SCREEN_HEIGHT);
+//FOR "SPACE" INPUT
+bool addForce = false;
+bool startedSimulation = false;
 
+//FOR CAMERA SWITCH
 std::string cameraType = "Ortho";
 
 
-//Key Input Handler
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-    //Orthographic
+    //switch to ortho
     if (key == GLFW_KEY_1 && action == GLFW_PRESS)
     {
         if (cameraType != "Ortho") {
             cameraType = "Ortho";
-            mainCamera = new OrthoCamera();
-            std::cout << "Shifted to Ortho Camera" << std::endl;
+            std::cout << "Switched to Ortho Camera" << std::endl;
 
         }
         else {
@@ -72,50 +70,21 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         }
     }
 
-    //Perspective
+    //switch to perspective
     else if (key == GLFW_KEY_2 && action == GLFW_PRESS)
     {
         if (cameraType != "Perspective") {
             cameraType = "Perspective";
-            mainCamera = new PerspectiveCamera();
-            std::cout << "Shifted to Perspective Camera" << std::endl;
+            std::cout << "Switched to Perspective Camera" << std::endl;
         }
         else {
             std::cout << "Already using Perspective projection" << std::endl;
         }
     }
-
-    //Rotate downwards
-    else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        if (cameraType == "Ortho") {
-            orthoCamera->topMost -= 20;
-        }
-        else {
-            persCamera->cameraPos.x -= 30;
-        }
-        std::cout << "Shifted downwards" << std::endl;
-    }
-
-    //Rotate upwards
-    else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        if (cameraType == "Ortho")
-            orthoCamera->topMost += 20;
-        else
-            persCamera->cameraPos.x += 30;
-
-        std::cout << "Shifted upwards" << std::endl;
-    }
-
-    //Rotate to the left
+        //Rotate to the left
     else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        if (cameraType == "Ortho")
-            orthoCamera->rightMost += 15;
-        else
-            persCamera->cameraPos.y -= 30;
-
+        rotate -= 0.05f;
         std::cout << "Shifted to the left" << std::endl;
     }
 
@@ -123,47 +92,45 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     //Rotate to the right
     else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        if (cameraType == "Ortho")
-            orthoCamera->rightMost -= 15;
-        else
-            persCamera->cameraPos.y += 30;
-
+        rotate += 0.05f;
         std::cout << "Shifted to the right" << std::endl;
+    
     }
 
-    //Start
-    else if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-    {
-        if (!bStart) {
-            bStart = true;
-            std::cout << "SIMULATION STARTED" << std::endl;
-        }
-
+    else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !startedSimulation) {
+        addForce = true;
+        startedSimulation = true;
+        std::cout << "Started simulation!" << std::endl;
     }
-
 }
 
-
-//----------MAIN FUNCTION-----------
 int main(void)
 {
     GLFWwindow* window;
 
+    /* Initialize the library */
     if (!glfwInit())
         return -1;
 
-    window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "IGLOO", NULL, NULL);
+    /* Create a windowed mode window and its OpenGL context */
+    window = glfwCreateWindow(width, height, "IGLOO", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
         return -1;
     }
 
+
+    
+    /* Make the window's context current */
     glfwMakeContextCurrent(window);
     gladLoadGL();
 
-    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    glViewport(0, 0,width,height);
 
+    glfwSetKeyCallback(window, Key_Callback);
+
+    
     //--------CREATE SHADER--------
     Shader* shader = new Shader();
     GLuint shaderProg = shader->createShader("Shaders/shader.vert", "Shaders/shader.frag");
@@ -171,178 +138,239 @@ int main(void)
     shader->deleteShader();
 
 
-
     //--------DECLARATION OF NEEDED VARIABLES-----------
-    P6::PhysicsWorld pWorld = P6::PhysicsWorld();
-    ModelManager modelManager = ModelManager();
+    Camera* camera = new Camera();
+    P6::PhysicsWorld* pWorld = new P6::PhysicsWorld();
     std::list<RenderParticle*> RenderParticles;
-    P6::GravityForceGenerator Gravity = P6::GravityForceGenerator(P6::MyVector(0,-9.8,0));
-
-    GLuint VAO, VBO;
-
-    glm::mat4 viewMatrix = glm::mat4(1.0f);
-    glm::mat4 projection = glm::mat4(1.0f);
-
-
-    float timePoint = 0.0f;
-    float converter = 1000000;  //used for converting timePoint to seconds
 
     using clock = std::chrono::high_resolution_clock;
     auto curr_time = clock::now();
     auto prev_time = curr_time;
     std::chrono::nanoseconds curr_ns(0);
 
-    /*ASKING USER INPUT */
-    std::cout << "Cable Length: ";
-    std::cin >> cableLength;
+    GLuint VBO;
 
-    std::cout << "Particle Gap: ";
-    std::cin >> particleGap;
+    //default values
+    float length = 200;
+    float gap = 100;
+    float radius = 30;
+    float gravityStr = -100;
+    float fX = 50000, fY = 0, fZ = 0;
+    
+   
+    //USER INPUT
+    std::cout << "Cable Length: "; std::cin >> length;
+    std::cout << "Particle Gap: "; std::cin >> gap;
+    std::cout << "Particle Radius: "; std::cin >> radius;
+    std::cout << "Gravity Strength: "; std::cin >> gravityStr;
+    std::cout << "Apply Force" << std::endl;
+    std::cout << "x: "; std::cin >> fX;
+    std::cout << "y: "; std::cin >> fY;
+    std::cout << "z: "; std::cin >> fZ;
 
-    std::cout << "Particle Radius: ";
-    std::cin >> particleRadius;
 
-    std::cout << "GravityStrength: ";
-    std::cin >> gravityStrength;
+    float mass = 50;
+    float default_y = 200;
+    MyVector applyForce = MyVector(fX, fY, fZ);
+    glm::vec4 colorVec = glm::vec4(254 / 254.0f, 0 / 254.0f, 0 / 254.0f, 1.0f); //red
 
-    std::cout << "Apply Force" << std::endl << "x:";
-    std::cin >> forceX;
-    std::cout << "y:";
-    std::cin >> forceY;
-    std::cout << "z:";
-    std::cin >> forceZ;
 
-    /*PARTICLE DECLARATION FOR ANCHORS*/
-    /*These anchor particles will be invisble, to hold the render particles that we see on screen*/
-    P6::P6Particle* p1 = new P6::P6Particle(MyVector(0,0,0), MyVector(0,10,0), MyVector(0, 0, 0));
-    P6::P6Particle* p2 = new P6::P6Particle(MyVector(30 + particleGap,0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
-    P6::P6Particle* p3 = new P6::P6Particle(MyVector(-30 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
-    P6::P6Particle* p4 = new P6::P6Particle(MyVector(60 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
-    P6::P6Particle* p5 = new P6::P6Particle(MyVector(-60 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+    //----------------1ST PARTICLE------------------
+    //instantiate anchor particle
+    P6Particle* a1 = new P6Particle(MyVector(-gap*2, default_y, 0), 0, mass, radius);
+    pWorld->AddParticle(a1);
 
-    /*These anchor particles will be seen on screen*/
-    P6::P6Particle* p6 = new P6::P6Particle(MyVector(30 + particleGap,0,0), MyVector(0,10,0), MyVector(0, 0, 0));
-    P6::P6Particle* p7 = new P6::P6Particle(MyVector(0,30 + particleGap, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
-    P6::P6Particle* p8 = new P6::P6Particle(MyVector(-30 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
-    P6::P6Particle* p9 = new P6::P6Particle(MyVector(60 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
-    P6::P6Particle* p10 = new P6::P6Particle(MyVector(-60 + particleGap, 0, 0), MyVector(0, 10, 0), MyVector(0, 0, 0));
+    //instantiate actual particle
+    P6Particle* p1 = new P6Particle(gravityStr, MyVector(a1->Position.x, -10, 0), mass, radius);
+    pWorld->AddParticle(p1);
 
-    pWorld.AddParticle(p6);
-    pWorld.AddParticle(p7);
-    pWorld.AddParticle(p8);
-    pWorld.AddParticle(p9); 
-    pWorld.AddParticle(p10); 
-
-    /*PARITCLE RENDERING*/
-    Model3D* m1 = new Model3D(glm::vec3(particleRadius, particleRadius, particleRadius), glm::vec4(1, 0, 0, 0), shaderProg);
+    //instantiate the particle's model
+    Model3D* m1 = new Model3D(colorVec, shaderProg);
     m1->loadModel("3D/sphere.obj", &VBO);
-    modelManager.AddModel(m1);
 
-    RenderParticle* rp1 = new RenderParticle(p6, m1);
+    //instantiate a render particle
+    RenderParticle* rp1 = new RenderParticle(p1, m1);
+    rp1->Scale = MyVector(p1->radius, p1->radius, p1->radius);
     RenderParticles.push_back(rp1);
-    RenderParticle* rp2 = new RenderParticle(p7, m1);
+
+    //instantiate cable for these particles
+    Cable* cable1 = new Cable(a1, length);
+    cable1->particles[1] = p1;
+    pWorld->Links.push_back(cable1);
+
+    //instantiate render line 
+    RenderLine* line1 = new RenderLine(a1->Position, p1->Position, MyVector(1, 1, 1));
+    
+
+
+    //----------------2ND PARTICLE------------------
+    P6Particle* a2 = new P6Particle(MyVector(-gap, default_y, 0), 0, mass, radius);
+    pWorld->AddParticle(a2);
+
+    P6Particle* p2 = new P6Particle(gravityStr, MyVector(a2->Position.x, -10, 0), mass, radius);
+    pWorld->AddParticle(p2);
+
+    Model3D* m2 = new Model3D(colorVec, shaderProg);
+    m2->loadModel("3D/sphere.obj", &VBO);
+
+    RenderParticle* rp2 = new RenderParticle(p2, m2);
+    rp2->Scale = MyVector(p2->radius, p2->radius, p2->radius);
     RenderParticles.push_back(rp2);
-    RenderParticle* rp3 = new RenderParticle(p8, m1);
+
+    Cable* cable2 = new Cable(a2, length);
+    cable2->particles[1] = p2;
+    pWorld->Links.push_back(cable2);
+
+    RenderLine* line2 = new RenderLine(a2->Position, p2->Position, MyVector(1, 1, 1));
+
+
+
+    //----------------3RD PARTICLE------------------
+    P6Particle* a3 = new P6Particle(MyVector(0, default_y, 0), 0, mass, radius);
+    pWorld->AddParticle(a3);
+
+    P6Particle* p3 = new P6Particle(gravityStr, MyVector(a3->Position.x, -10, 0), mass, radius);
+    pWorld->AddParticle(p3);
+
+    Model3D* m3 = new Model3D(colorVec, shaderProg);
+    m3->loadModel("3D/sphere.obj", &VBO);
+
+    RenderParticle* rp3 = new RenderParticle(p3, m3);
+    rp3->Scale = MyVector(p3->radius, p3->radius, p3->radius);
     RenderParticles.push_back(rp3);
-    RenderParticle* rp4 = new RenderParticle(p9, m1);
+
+    Cable* cable3 = new Cable(a3, length);
+    cable3->particles[1] = p3;
+    pWorld->Links.push_back(cable3);
+
+    RenderLine* line3 = new RenderLine(a3->Position, p3->Position, MyVector(1, 1, 1));
+
+
+    
+    //----------------4TH PARTICLE------------------
+    P6Particle* a4 = new P6Particle(MyVector(gap, default_y, 0), 0, mass, radius);
+    pWorld->AddParticle(a4);
+
+    P6Particle* p4 = new P6Particle(gravityStr, MyVector(a4->Position.x, -10, 0), mass, radius);
+    pWorld->AddParticle(p4);
+
+    Model3D* m4 = new Model3D(colorVec, shaderProg);
+    m4->loadModel("3D/sphere.obj", &VBO);
+
+    RenderParticle* rp4 = new RenderParticle(p4, m4);
+    rp4->Scale = MyVector(p4->radius, p4->radius, p4->radius);
     RenderParticles.push_back(rp4);
-    RenderParticle* rp5 = new RenderParticle(p10, m1);
+
+    Cable* cable4 = new Cable(a4, length);
+    cable4->particles[1] = p4;
+    pWorld->Links.push_back(cable4);
+
+    RenderLine* line4 = new RenderLine(a4->Position, p4->Position, MyVector(1, 1, 1));
+
+
+
+    //----------------5TH PARTICLE------------------
+    P6Particle* a5 = new P6Particle(MyVector(gap*2, default_y, 0), 0, mass, radius);
+    pWorld->AddParticle(a5);
+
+    P6Particle* p5 = new P6Particle(gravityStr, MyVector(a5->Position.x, -10, 0), mass, radius);
+    pWorld->AddParticle(p5);
+
+    Model3D* m5 = new Model3D(colorVec, shaderProg);
+    m5->loadModel("3D/sphere.obj", &VBO);
+
+    RenderParticle* rp5 = new RenderParticle(p5, m5);
+    rp5->Scale = MyVector(p5->radius, p5->radius, p5->radius);
     RenderParticles.push_back(rp5);
 
-    // The cables hold on to the invisible spheres
-    // Cable* cable = new Cable(cableLength);
-    // pWorld.forceRegistry.Add(p1,cable);
-    // pWorld.forceRegistry.Add(p2,cable);
-    // pWorld.forceRegistry.Add(p3,cable);
-    // pWorld.forceRegistry.Add(p4,cable);
-    // pWorld.forceRegistry.Add(p5,cable);
+    Cable* cable5 = new Cable(a5, length);
+    cable5->particles[1] = p5;
+    pWorld->Links.push_back(cable5);
 
-    P6::Rod* r1 = new P6::Rod();
-    r1->particles[0] = p1;
-    r1->particles[1] = p6;
-    r1->length = 100;
+    RenderLine* line5 = new RenderLine(a5->Position, p5->Position, MyVector(1, 1, 1));
 
-    P6::Rod* r2 = new P6::Rod();
-    r2->particles[0] = p2;
-    r2->particles[1] = p7;
-    r2->length = 100;
-    pWorld.Links.push_back(r2);
 
-    P6::Rod* r3 = new P6::Rod();
-    r3->particles[0] = p3;
-    r3->particles[1] = p8;
-    r3->length = 100;
-    pWorld.Links.push_back(r3);
-
-    P6::Rod* r4 = new P6::Rod();
-    r4->particles[0] = p4;
-    r4->particles[1] = p9;
-    r4->length = 100;
-    pWorld.Links.push_back(r4);
-
-    P6::Rod* r5 = new P6::Rod();
-    r5->particles[0] = p5;
-    r5->particles[1] = p10;
-    r5->length = 100;
-    pWorld.Links.push_back(r5);
-    
-    // p10->AddForce(P6::MyVector(0,6000,0));
-
-    //Renderline* renderl = new Renderline(MyVector(0, p2->Position.x, 0), MyVector(0, cableLength, 0), shaderProg);
-
-    srand((unsigned)time(NULL));
+  
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
-        if (bStart)
-        {
-        //FIXED UPDATE
+        /* Render here */
+        glClear(GL_COLOR_BUFFER_BIT);
+
         curr_time = clock::now();
         auto dur = std::chrono::duration_cast<std::chrono::nanoseconds> (curr_time - prev_time);
         prev_time = curr_time;
 
-        unsigned int viewLoc = glGetUniformLocation(shaderProg, "view");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mainCamera->getView()));
+        curr_ns += dur;
 
-        unsigned int projectionLoc = glGetUniformLocation(shaderProg, "projection");
-        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(mainCamera->giveProjection()));
+        if (curr_ns >= timestep) {
+            auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(curr_ns);
 
-            curr_ns += dur;
-            timePoint += (float)dur.count() / 1000;
+            curr_ns -= curr_ns;
 
-            if (curr_ns >= timestep) {
-                auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(curr_ns);
+            pWorld->Update((float)ms.count() / 1000);
 
-                curr_ns -= curr_ns;
-
-                pWorld.Update((float)ms.count() / 1000);
-
-                m1->setCameraProperties(mainCamera->giveProjection(), mainCamera->getView());
-               //renderl->Update(MyVector(p2->Position.x, 0, 0), MyVector(0, cableLength, 0), mainCamera->giveProjection());
-            }
-
-            //--------DRAW MODEL-------
-            for (std::list<RenderParticle*>::iterator i = RenderParticles.begin();
-                i != RenderParticles.end();
-                i++
-                ) {
-
-                (*i)->draw();
-            }
         }
 
-        //Key Callback
-        glfwSetKeyCallback(window, key_callback);
-        glClear(GL_COLOR_BUFFER_BIT);
+        //adds force to the leftmost particle when [SPACE] is pressed once
+        if (addForce) {
+            p1->AddForce(MyVector(50000, 0, 0) * 10);
+            addForce = false;
+        }
+
+        //accumulates the length of the cables
+        if (cable1->length < length) {
+            cable1->length += 0.1f;
+            cable2->length += 0.1f;
+            cable3->length += 0.1f;
+            cable4->length += 0.1f;
+            cable5->length += 0.1f;
+        }
 
 
+        //get the projection and view matrix
+        glm::mat4 projection = camera->getProjection(cameraType, width, height);
+        glm::mat4 view = camera->getView(cameraType, rotate);
+
+        //bind camera to the shader
+        camera->bindCamera(cameraType, width, height, rotate, shaderProg);
+
+
+        //draw the particles
+        for (std::list<RenderParticle*>::iterator i = RenderParticles.begin();
+            i != RenderParticles.end();
+            i++
+            ) {
+
+            (*i)->draw(cameraType);
+        }
+
+
+        //display the render lines
+        line1->Update(a1->Position, p1->Position, projection);
+        line1->Draw();
+
+        line2->Update(a2->Position, p2->Position, projection);
+        line2->Draw();
+
+        line3->Update(a3->Position, p3->Position, projection);
+        line3->Draw();
+
+        line4->Update(a4->Position, p4->Position, projection);
+        line4->Draw();
+
+        line5->Update(a5->Position, p5->Position, projection);
+        line5->Draw();
+     
+
+        //swap front and back buffers
         glfwSwapBuffers(window);
+
+        //poll for and process events
         glfwPollEvents();
     }
 
-
-    glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
 
     glfwTerminate();

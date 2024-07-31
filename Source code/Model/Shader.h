@@ -30,6 +30,6 @@ namespace model {
 			void loadVertAndFrag(std::string fileVert, std::string fileFrag);
 			void deleteShader();
 
-		};
+	};
 
 }

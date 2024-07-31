@@ -3,7 +3,6 @@
 #include "ForceGenerator.h"
 
 namespace P6 {
-
 	class DragForceGenerator : public ForceGenerator
 	{
 		//FIELDS

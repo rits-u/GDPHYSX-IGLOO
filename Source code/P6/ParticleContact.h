@@ -1,37 +1,27 @@
 #pragma once
 #include "P6Particle.h"
+#include "iostream"
 
+namespace P6 {
+	class ParticleContact
+	{
+		//FIELDS
+		public:
+			float depth; //interpenetration depth
 
-namespace P6
-{
-    class ParticleContact
-    {
-        public:
-        
-        //interpenetration depth
-        float depth;
+			P6Particle* particles[2];
+			float restitution;
+			MyVector contactNormal;
 
-        //The particles in contact
-        P6Particle* particles[2];
+			void Resolve(float time);
 
-        //Holds the coefficient of restitution
-        float restitution;
+			float GetSeparatingSpeed();
 
-        //Contact normal of this collision
-        MyVector contactNormal;
+		//METHODS
+		protected:
+			void ResolveInterpenetration(float time);
+			void ResolveVelocity(float time);
+	};
 
-        //Resolve this contact
-        void Resolve(float time);
-
-        //Get the separating speed
-        float GetSeparatingSpeed();
-
-        protected:
-        //Calculates the new velocities of the objects
-        void ResolveVelocity(float time);
-
-        //Calculates the interpenetration resolution
-        void ResolveInterpenertration(float time);
-
-    };
 }
+

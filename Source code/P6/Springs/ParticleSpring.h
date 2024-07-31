@@ -1,26 +1,24 @@
 #pragma once
+
 #include "../ForceGenerator.h"
 
-namespace P6
-{
-    class ParticleSpring : public ForceGenerator
-    {
+namespace P6 {
+	class ParticleSpring : public ForceGenerator
+	{
+	public:
+		ParticleSpring(P6Particle* particle, float _springConst, float _restLen) :
+			otherParticle(particle), springConstant(_springConst), restLength(_restLen) {}
 
-        private:
-        //the other particle this spring is attached to
-        P6Particle* otherParticle;
+		void UpdateForce(P6Particle* particle, float time) override;
 
-        //spring contstant "stiffness of spring"
-        float springConstant;
+	private:
+		//this is where the spring is attached
+		P6Particle* otherParticle;
 
-        //rest length for this spring
-        float restLength;
+		float springConstant; //how hard your spring is
 
-        public:
-        //Constrcutor
-        ParticleSpring(P6Particle* particle, float _springConst, float _restLen);
+		float restLength; //length of the spring at rest
+	};
 
-        //Override the Update Force of th eGenerator
-        void UpdateForce(P6Particle* particle, float time) override;
-    };
 }
+

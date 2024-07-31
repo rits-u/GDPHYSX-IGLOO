@@ -8,7 +8,7 @@ void ForceRegistry::Add(P6Particle* particle, ForceGenerator* generator)
 
 	toAdd.particle = particle;
 	toAdd.generator = generator;
-		
+
 	Registry.push_back(toAdd);
 }
 
@@ -16,7 +16,7 @@ void ForceRegistry::Add(P6Particle* particle, ForceGenerator* generator)
 void ForceRegistry::Remove(P6Particle* particle, ForceGenerator* generator)
 {
 	Registry.remove_if(
-		
+
 		[particle, generator](ParticleForceRegistry reg) {
 			return reg.particle == particle && reg.generator == generator;
 		}

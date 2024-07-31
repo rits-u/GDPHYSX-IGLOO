@@ -14,7 +14,7 @@ void DragForceGenerator::UpdateForce(P6Particle* particle, float time)
 
 	//Df        =  k1 * m    +  k2 * m
 	float dragF = (k1 * mag) + (k2 * mag);
-	MyVector dir = currV.normalize(); 
+	MyVector dir = currV.normalize();
 
 	particle->AddForce(dir * -dragF);
 }

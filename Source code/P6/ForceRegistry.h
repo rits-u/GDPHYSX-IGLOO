@@ -7,14 +7,15 @@
 namespace P6 {
 	class ForceRegistry
 	{
+
 		//FIELDS
 		protected:
 			struct ParticleForceRegistry {
 				P6Particle* particle;
 				ForceGenerator* generator;
-		};
+			};
 
-		std::list<ParticleForceRegistry> Registry;
+			std::list<ParticleForceRegistry> Registry;
 
 		//METHODS
 		public:
@@ -24,7 +25,7 @@ namespace P6 {
 
 			void UpdateForces(float time);
 
-		
+
 	};
 
 }

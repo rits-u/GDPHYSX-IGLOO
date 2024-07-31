@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 namespace P6 {
 	class MyVector
@@ -10,14 +12,13 @@ namespace P6 {
 		//FIELDS
 		public:
 			float x, y, z;
-			float dot = 0.0f;
-		
+
 		//CONSTRUCTORS
 		public:
 			MyVector() : x(0), y(0), z(0) {}
 			MyVector(const float _x, const float _y, const float _z) : x(_x), y(_y), z(_z) {}
 
-			explicit operator glm::vec3() const { return glm::vec3(x, y, z); }  
+			explicit operator glm::vec3() const { return glm::vec3(x, y, z); }
 
 		//METHODS
 		public:
@@ -36,7 +37,6 @@ namespace P6 {
 			void operator*=(const MyVector v);
 			float scalarProduct(const MyVector v);
 			MyVector getCrossProduct(const MyVector v);
-			float getDotProduct(const MyVector v, const MyVector v2);
 
 	};
 }
