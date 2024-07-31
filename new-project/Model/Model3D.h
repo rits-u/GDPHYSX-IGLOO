@@ -20,37 +20,32 @@ namespace model {
 
 	class Model3D
 	{
+
 		//FIELDS
-	public:
-		MyVector position;
-		MyVector scale;
-		glm::vec3 axis;
-		glm::vec3 theta;
-		glm::vec4 color;
-		std::vector<GLuint> mesh_indices;
-		GLuint VAO;
-		GLuint shaderProg;
+		public:
+			MyVector position;
+			MyVector scale;
+			glm::vec3 axis;
+			glm::vec3 theta;
+			glm::vec4 color;
+			std::vector<GLuint> mesh_indices;
+			GLuint VAO;
+			GLuint shaderProg;
 
 		//CONSTRUCTOR
-	public:
-		Model3D();
-		Model3D(MyVector scale, glm::vec4 color, GLuint shaderProg);
-	//	Model3D(MyVector position, glm::vec4 color, glm::vec3 scale);
-	//	Model3D(glm::vec3 scale, glm::vec4 color);
+		public:
+			Model3D();
+			Model3D(glm::vec4 color, GLuint shaderProg);
+			Model3D(MyVector scale, glm::vec4 color, GLuint shaderProg);
 
 		//METHODS
-	public:
-		void loadModel(std::string objSrc, GLuint* VBO);
-		//void drawModel(glm::mat4 projection, glm::mat4 viewMatrix);
-		void drawModel();
-		void bindCamera(glm::mat4 projection, glm::mat4 viewMatrix);
-		//void setPosition(MyVector position);
-		void setScale(MyVector scale);
+		public:
+			void loadModel(std::string objSrc, GLuint* VBO);
+			void drawModel();
+			void setScale(MyVector scale);
 
-
-	private:
-		void bindBuffers(tinyobj::attrib_t attributes, GLuint* VBO);
-		
+		private:
+			void bindBuffers(tinyobj::attrib_t attributes, GLuint* VBO);
 
 	};
 

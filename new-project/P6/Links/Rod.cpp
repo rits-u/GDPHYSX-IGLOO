@@ -1,6 +1,7 @@
 #include "Rod.h"
 using namespace P6;
 
+//this function handles the link between two particles
 ParticleContact* Rod::GetContact() {
 	float currLen = CurrentLength();
 
@@ -17,6 +18,7 @@ ParticleContact* Rod::GetContact() {
 	//Rod is longer than expected
 	if (currLen > length) {
 		ret->contactNormal = dir;
+
 		ret->depth = currLen - length; //depth should always be POSITIVE
 	}
 

@@ -17,6 +17,7 @@ Camera::Camera() {
 	this->FOV = 60.f;
 }
 
+//this function is for binding the camera properties to the shader
 void Camera::bindCamera(std::string camType, float width, float height, float rotate, GLuint shaderProg) {
 	glm::mat4 projection = this->getProjection(camType, width, height);
 	glm::mat4 view = this->getView(camType, rotate);
@@ -24,18 +25,13 @@ void Camera::bindCamera(std::string camType, float width, float height, float ro
 	glUseProgram(shaderProg);
 
 	unsigned int projLoc = glGetUniformLocation(shaderProg, "projection");
-	glUniformMatrix4fv(projLoc,  
-		1,       
-		GL_FALSE,
-		glm::value_ptr(projection)); 
+	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection)); 
 
 	unsigned int viewLoc = glGetUniformLocation(shaderProg, "view");
-	glUniformMatrix4fv(viewLoc,  
-		1,       
-		GL_FALSE,
-		glm::value_ptr(view)); 
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view)); 
 }
 
+//this function computes the projection matrix based on the camera type parameter
 glm::mat4 Camera::getProjection(std::string camType, float width, float height) {
 	glm::mat4 projection = glm::mat4(1);
 
@@ -53,17 +49,15 @@ glm::mat4 Camera::getProjection(std::string camType, float width, float height) 
 	return projection;
 }
 
+//this function computes the view matrix based on the camera type parameter
 glm::mat4 Camera::getView(std::string camType, float rotate) {
 	glm::mat4 view = glm::mat4(1);
 
 	const float radius = 10.0f;
-	//float camX = sin(glfwGetTime()) * radius;
-	//float camZ = cos(glfwGetTime()) * radius;
 	float camX = sin(rotate) * radius;
 	float camZ = cos(rotate) * radius;
 
 	if (camType == "Ortho") {
-		// viewMatrix1 = glm::lookAt(glm::vec3(0, camY, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 		view = glm::lookAt(glm::vec3(camX, 0, camZ), this->center, this->worldUp);
 
 	}

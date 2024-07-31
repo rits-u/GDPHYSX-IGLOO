@@ -75,6 +75,12 @@
     <ClCompile Include="P6\Springs\ParticleSpring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="P6\Links\Cable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\LineManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tiny_obj_loader.h">
@@ -132,6 +138,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="P6\Springs\ParticleSpring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="P6\Links\Cable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\LineManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

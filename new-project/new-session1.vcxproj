@@ -139,6 +139,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Utility\LineManager.cpp" />
+    <ClCompile Include="P6\Links\Cable.cpp" />
     <ClCompile Include="P6\Springs\AnchoredSpring.cpp" />
     <ClCompile Include="P6\P6Particle.cpp" />
     <ClCompile Include="P6\GravityForceGenerator.cpp" />
@@ -161,6 +163,8 @@
     <ClCompile Include="Utility\RenderLine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Utility\LineManager.h" />
+    <ClInclude Include="P6\Links\Cable.h" />
     <ClInclude Include="P6\Springs\AnchoredSpring.h" />
     <ClInclude Include="P6\P6Particle.h" />
     <ClInclude Include="P6\GravityForceGenerator.h" />

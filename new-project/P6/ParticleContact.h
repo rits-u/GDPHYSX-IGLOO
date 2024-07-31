@@ -5,21 +5,22 @@
 namespace P6 {
 	class ParticleContact
 	{
-	public:
-		float depth; //interpenetration depth
+		//FIELDS
+		public:
+			float depth; //interpenetration depth
 
-		P6Particle* particles[2];
-		float restitution;
-		MyVector contactNormal;
+			P6Particle* particles[2];
+			float restitution;
+			MyVector contactNormal;
 
-		void Resolve(float time);
+			void Resolve(float time);
 
-		float GetSeparatingSpeed();
+			float GetSeparatingSpeed();
 
-	protected:
-
-		void ResolveInterpenetration(float time);
-		void ResolveVelocity(float time);
+		//METHODS
+		protected:
+			void ResolveInterpenetration(float time);
+			void ResolveVelocity(float time);
 	};
 
 }

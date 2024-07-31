@@ -10,6 +10,7 @@ void AnchoredSpring::UpdateForce(P6Particle* particle, float time) {
 
 	//			f		=		-k		*		|lcurr - lrest|
 	float springForce = -springConstant * abs(mag - restLength);
+	//float springForce =  abs(mag - restLength);
 
 	force = force.normalize();
 	force = force * springForce;

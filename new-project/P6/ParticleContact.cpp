@@ -84,7 +84,4 @@ void ParticleContact::Resolve(float time) {
 
 	//solve for the pos after collision
 	ResolveInterpenetration(time);
-	//	std::cout << "aaa" << std::endl;
-
-		//the two functions are interchangeable	
 }

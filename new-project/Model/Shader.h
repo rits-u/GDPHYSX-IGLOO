@@ -16,19 +16,19 @@ namespace model {
 	class Shader
 	{
 		//FIELDS;
-	private:
-		GLuint vertShader;
-		GLuint fragShader;
+		private:
+			GLuint vertShader;
+			GLuint fragShader;
 
 		//CONSTRUCTOR
-	public:
-		Shader();
+		public:
+			Shader();
 
 		//METHODS
-	public:
-		GLuint createShader(std::string fileVert, std::string fileFrag);
-		void loadVertAndFrag(std::string fileVert, std::string fileFrag);
-		void deleteShader();
+		public:
+			GLuint createShader(std::string fileVert, std::string fileFrag);
+			void loadVertAndFrag(std::string fileVert, std::string fileFrag);
+			void deleteShader();
 
 	};
 

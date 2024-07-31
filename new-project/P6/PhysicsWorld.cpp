@@ -42,6 +42,7 @@ void PhysicsWorld::CheckLifespan(float time) {
 	}
 }
 
+//this function instantiates a particle contact
 void PhysicsWorld::AddContact(P6Particle* p1, P6Particle* p2, float restitution, MyVector contactNormal, float depth) {
 	ParticleContact* toAdd = new ParticleContact();
 
@@ -54,6 +55,7 @@ void PhysicsWorld::AddContact(P6Particle* p1, P6Particle* p2, float restitution,
 	Contacts.push_back(toAdd);
 }
 
+// this function checks for every collision that a particle might have
 void PhysicsWorld::GenerateContacts() {
 	Contacts.clear();
 
@@ -72,6 +74,10 @@ void PhysicsWorld::GenerateContacts() {
 	}
 }
 
+
+/*  this function checks every particle if it is overlapping to other particles
+	by comparing distances to each other, if it overlaps,
+	it means that there is a contact/collision	*/
 void PhysicsWorld::GetOverlaps() {
 
 	//iterate through the list upto the 2nd to the last element

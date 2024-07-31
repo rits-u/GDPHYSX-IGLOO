@@ -11,7 +11,6 @@ RenderParticle::RenderParticle(P6Particle* p, Model3D* model) {
 // of the particle, also used for calling the renderer of the object
 void RenderParticle::draw(std::string type) {
 	if (!this->physicsParticle->IsDestroyed()) {
-		//this->renderObject->setPosition(this->physicsParticle->Position);
 		this->renderObject->position = this->physicsParticle->Position;
 		float r = this->physicsParticle->radius;
 		MyVector radius = MyVector(r, r, r);

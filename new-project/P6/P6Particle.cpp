@@ -7,22 +7,24 @@ P6Particle::P6Particle() {
 	this->Acceleration = MyVector(0, 0, 0);
 	this->lifespan = 10.0f;
 	this->spawnTime = 0.0f;
+	this->gravityStr = 1.0f;
 }
 
-P6Particle::P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration, float lifespan) {
+
+P6Particle::P6Particle(MyVector Position, float damping, float mass, float radius) {
 	this->Position = Position;
-	this->Velocity = Velocity;
-	this->Acceleration = Acceleration;
-	this->lifespan = lifespan;
-	this->spawnTime = 0.0f;
+	this->damping = damping;
+	this->mass = mass;
+	this->radius = radius;
+	this->gravityStr = 1.f;
 }
 
-P6Particle::P6Particle(MyVector Position, MyVector Velocity, MyVector Acceleration, float lifespan, float spawnTime) {
+P6Particle::P6Particle(float gravityStr, MyVector Position, float mass, float radius) {
 	this->Position = Position;
-	this->Velocity = Velocity;
-	this->Acceleration = Acceleration;
-	this->lifespan = lifespan;
-	this->spawnTime = spawnTime;
+	this->damping = 0.9f;
+	this->mass = mass;
+	this->radius = radius;
+	this->gravityStr = gravityStr;
 }
 
 //this function is used for updating the position of the particle
@@ -50,6 +52,7 @@ void P6Particle::Update(float time) {
 	this->ResetForce();
 }
 
+
 //this function resets the force so that it won't apply force unnecessarily
 void P6Particle::ResetForce() {
 	this->accumulatedForce = MyVector(0, 0, 0);
@@ -69,4 +72,9 @@ bool P6Particle::IsDestroyed() {
 //This function updates the accumulated force
 void P6Particle::AddForce(MyVector force) {
 	accumulatedForce += force;
+}
+
+void P6Particle::AddForceAtPoint(MyVector force, MyVector p) {
+	this->AddForce(force);
+	this->accumulatedForce = p.getCrossProduct(force);
 }

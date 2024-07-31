@@ -33,11 +33,6 @@ namespace model {
 			glm::mat4 getProjection(std::string camType, float width, float height);
 			glm::mat4 getView(std::string camType, float rotate);
 
-
-			
-
-
-
 	};
 
 }

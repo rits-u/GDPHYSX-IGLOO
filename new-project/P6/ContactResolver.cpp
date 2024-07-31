@@ -1,6 +1,7 @@
 #include "ContactResolver.h"
 using namespace P6;
 
+//this function checks every contact/collision of a particle
 void ContactResolver::ResolveContacts(std::vector<ParticleContact*> contacts, float time) {
 	current_iterations = 0;
 
@@ -9,7 +10,7 @@ void ContactResolver::ResolveContacts(std::vector<ParticleContact*> contacts, fl
 		float curr_min = contacts[0]->GetSeparatingSpeed();
 		float max_depth = contacts[0]->depth;
 
-		for (int i = 1; 1 < contacts.size(); i++) {
+		for (int i = 1; i < contacts.size(); i++) {
 			float ss = contacts[i]->GetSeparatingSpeed();
 
 			if (ss < curr_min && (ss < 0 || 0 < contacts[i]->depth)) {
@@ -27,8 +28,6 @@ void ContactResolver::ResolveContacts(std::vector<ParticleContact*> contacts, fl
 		}
 
 		contacts[current_index]->Resolve(time);
-		current_iterations++;
-
-		//owo		
+		current_iterations++;	
 	}
 }
